@@ -67,7 +67,19 @@ section.sec{padding-block:88px}
 .hero-meta .tag{font-size:19px;max-width:40ch}
 .facts{display:grid;gap:4px;font-family:var(--mono);font-size:14px;color:var(--muted)}
 .facts b{color:var(--ink);font-weight:500}
-.ctas{display:flex;flex-wrap:wrap;gap:12px}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.hero-line{font-family:var(--display);font-weight:400;font-size:clamp(26px,3.8vw,42px);line-height:1.08;letter-spacing:.01em;margin-bottom:14px;max-width:18ch}
+.hero-line mark{background:var(--accent);color:var(--on-accent);padding:0 .14em;border-radius:4px;box-shadow:4px 4px 0 var(--ink)}
+.hero-msg .tag{font-size:17px;color:var(--muted);max-width:44ch}
+.hero-nums{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:4px 28px;align-self:end}
+.hero-nums .n{display:block;font-family:var(--display);font-size:clamp(28px,3.4vw,38px);line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.hero-nums .l{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.hero-nums-cap{grid-column:1/-1;margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.cta-links{display:inline-flex;flex-wrap:wrap;align-items:center;gap:18px;margin-left:8px;font-weight:600;font-size:15px}
+.cta-links a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px}
+.cta-links a:hover{text-decoration-color:var(--accent)}
+@media (max-width:480px){.hero-nums{gap:4px 18px}.cta-links{margin-left:0}}
+
 .btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;padding:12px 20px;border-radius:8px;text-decoration:none;border:1.5px solid var(--ink);color:var(--ink);background:transparent;transition:transform .15s,box-shadow .15s}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .btn:hover{transform:translate(-2px,-2px);box-shadow:3px 3px 0 var(--ink)}
@@ -644,18 +656,21 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
     </div>
     <h1 class="hero-logo"><img class="hero-mark lt" src="img/brand/mark-blue.png" alt=""><img class="hero-mark dk" src="img/brand/mark-light.png" alt="" aria-hidden="true"><img class="hero-word lt" src="img/brand/wordmark.png" alt="Edinburgh BioHackathon"><img class="hero-word dk" src="img/brand/wordmark-light.png" alt="" aria-hidden="true"></h1>
     <div class="hero-meta">
-      <p class="tag">Building a collaborative Bio-AI innovation community. Scotland's first student-led biohackathon.</p>
-      <div class="facts">
-        <div class="fact-next"><b>Next edition</b> · spring / early summer 2027</div>
-        <div>University of Edinburgh · independent, student-led</div>
-        <div class="fact-last">Last edition · 20–22 March 2026</div>
+      <div class="hero-msg">
+        <p class="hero-line">Scotland's first biohackathon is <mark>back</mark> in 2027.</p>
+        <p class="tag">48 hours. Life scientists and programmers, side by side, on real challenges from labs and industry.</p>
+      </div>
+      <div class="hero-nums" aria-label="2026 in numbers">
+        <div><span class="n">350</span><span class="l">applied</span></div>
+        <div><span class="n">100+</span><span class="l">took part</span></div>
+        <div><span class="n">&gt;95%</span><span class="l">stayed all weekend</span></div>
+        <p class="hero-nums-cap">Edinburgh BioHackathon 2026 · University of Edinburgh</p>
       </div>
     </div>
     <div class="ctas">
       <a class="btn primary" href="#sponsor">Sponsor 2027</a>
-      <a class="btn vol" href="mailto:biohackathon@ed.ac.uk?subject=Volunteering%20for%20Edinburgh%20BioHackathon%202027">Volunteer to help</a>
-      <a class="btn imp" href="#impact-page">See our impact →</a>
-      <a class="btn" href="#edition-2026">Explore the 2026 edition →</a>
+      <a class="btn" href="mailto:biohackathon@ed.ac.uk?subject=Volunteering%20for%20Edinburgh%20BioHackathon%202027">Volunteer to help</a>
+      <span class="cta-links"><a href="#impact-page">See our impact →</a><a href="#edition-2026">Explore 2026 →</a></span>
     </div>
     <div class="carousel" aria-roledescription="carousel" aria-label="2026 photos">
       <div class="track" id="track" tabindex="0"><figure class="slide" id="s0"><img src="img/quas.jpg" alt="Quas Drinks with the organising committee"><figcaption>Quas Drinks with the organising committee</figcaption></figure><figure class="slide" id="s1"><img loading="lazy" src="img/teams.jpg" alt="Teams at work in the Nucleus"><figcaption>Teams at work in the Nucleus</figcaption></figure><figure class="slide" id="s2"><img loading="lazy" src="img/hacking.jpg" alt="Hacking on Saturday"><figcaption>Hacking on Saturday</figcaption></figure><figure class="slide" id="s3"><img loading="lazy" src="img/discussion.jpg" alt="Teams working through a challenge"><figcaption>Teams working through a challenge</figcaption></figure><figure class="slide" id="s4"><img loading="lazy" src="img/judging.jpg" alt="Pitching to the judges"><figcaption>Pitching to the judges</figcaption></figure><figure class="slide" id="s5"><img loading="lazy" src="img/qa.jpg" alt="Mentors and teams in discussion"><figcaption>Mentors and teams in discussion</figcaption></figure><figure class="slide" id="s6"><img loading="lazy" src="img/lab1.jpg" alt="Lab visit during the weekend"><figcaption>Lab visit during the weekend</figcaption></figure><figure class="slide" id="s7"><img loading="lazy" src="img/breakfast.jpg" alt="Breakfast in the Nucleus"><figcaption>Breakfast in the Nucleus</figcaption></figure></div>
