@@ -1,0 +1,1237 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Edinburgh BioHackathon</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+<style>
+/* Layout: sticky nav, logo hero, alternating plain/tinted bands. Palette follows the 2026 site: white, near-black ink, electric blue, and its purple-teal-blue gradient for feature panels */
+:root{
+  color-scheme:light;
+  --bg:#FFFFFF; --band:#FAFAFA; --surface:#FFFFFF; --ink:#18181B; --muted:#4B5563; --line:#E5E7EB;
+  --accent:#3639FD; --gold:#9A6C00; --gold-bg:#FBF3DC; --silver:#55606E; --silver-bg:#EDF0F4; --bronze:#9C4F22; --bronze-bg:#F8E8DC; --cp:#0B7A60; --cp-bg:#DFF3EC; --accent-2:#77CACC; --accent-soft:#DBEAFE; --grad:linear-gradient(150deg,#7E4AA8 0%,#3F7F86 48%,#1E22B4 100%); --on-accent:#FFFFFF; --amber:#B86A00;
+  --display:'Bungee', 'Arial Black', Impact, sans-serif;
+  --body:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+h1,h2,h3{text-wrap:balance;margin:0}
+p{margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.band{background:var(--band)}
+section.sec{padding-block:88px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.sec-head{display:grid;gap:12px;margin-bottom:44px;max-width:680px}
+.sec-head h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,44px);line-height:1.05;letter-spacing:.01em}
+.lede{color:var(--muted);font-size:17px;max-width:62ch}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:20px;height:56px}
+.brand{font-family:var(--display);font-size:15px;color:var(--ink);text-decoration:none;white-space:nowrap}
+.brand span{color:var(--accent)}
+@media (max-width:480px){.brand{font-size:13px}}
+.navlinks{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin-left:auto;min-width:0}
+.navlinks::-webkit-scrollbar{display:none}
+.navlinks a{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:6px;white-space:nowrap}
+.navlinks a:hover{color:var(--ink);background:var(--accent-soft)}
+
+/* hero */
+.hero{padding-block:64px 40px}
+.status{display:inline-flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.chip{font-family:var(--mono);font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:var(--surface)}
+.chip.live{border-color:var(--accent);color:var(--accent)}
+.title{font-family:var(--display);font-weight:400;line-height:.98;font-size:clamp(40px,9.4vw,112px);letter-spacing:.01em;margin-bottom:24px}
+.title .o{color:var(--bg);-webkit-text-stroke:2px var(--ink);text-shadow:5px 5px 0 var(--accent);display:block}
+@supports not (-webkit-text-stroke:2px black){.title .o{color:var(--ink)}}
+.hero-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;align-items:end;margin-bottom:36px}
+.hero-meta .tag{font-size:19px;max-width:40ch}
+.facts{display:grid;gap:4px;font-family:var(--mono);font-size:14px;color:var(--muted)}
+.facts b{color:var(--ink);font-weight:500}
+.ctas{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;padding:12px 20px;border-radius:8px;text-decoration:none;border:1.5px solid var(--ink);color:var(--ink);background:transparent;transition:transform .15s,box-shadow .15s}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:3px 3px 0 var(--ink)}
+@media (prefers-reduced-motion: reduce){.btn{transition:none}.btn:hover{transform:none}}
+.hero-photo-unused{margin-top:44px;border-radius:14px;overflow:hidden;border:1px solid var(--line);aspect-ratio:3/1.35;max-width:100%}
+.hero-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.caption{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:10px}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.stat{padding:24px 20px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stat:nth-child(4n){border-right:none}
+.stat:nth-last-child(-n+4){border-bottom:none}
+.stat .n{font-family:var(--display);font-size:34px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+.stat .l{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:8px;text-transform:uppercase;letter-spacing:.06em}
+@media (max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(4n){border-right:1px solid var(--line)}.stat:nth-child(2n){border-right:none}.stat:nth-last-child(-n+4){border-bottom:1px solid var(--line)}.stat:nth-last-child(-n+2){border-bottom:none}}
+
+/* generic grids */
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
+@media (max-width:400px){.g2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:26px;display:grid;gap:10px;align-content:start;min-width:0}
+.card h3{font-size:18px;font-weight:600}
+.card p,.card li{color:var(--muted);font-size:15px}
+.kicker{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+
+/* composition bars */
+.bars{display:grid;gap:22px}
+.bar .lab{display:flex;justify-content:space-between;font-family:var(--mono);font-size:13px;color:var(--muted);margin-bottom:8px}
+.bar .track{display:flex;height:14px;border-radius:999px;overflow:hidden;background:var(--accent-soft)}
+.bar .fill{background:var(--accent)}
+
+/* winner */
+.winner{display:grid;grid-template-columns:1.1fr 1fr;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.winner img{width:100%;height:100%;object-fit:cover;display:block;min-height:260px}
+.winner .body{padding:32px;display:grid;gap:14px;align-content:center}
+.winner h3{font-family:var(--display);font-weight:400;font-size:26px;line-height:1.1}
+@media (max-width:760px){.winner{grid-template-columns:1fr}}
+
+/* gallery */
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.gallery figure{margin:0;border-radius:10px;overflow:hidden;position:relative;aspect-ratio:3/2;background:var(--accent-soft)}
+.gallery figure.tall{grid-row:span 2;aspect-ratio:auto}
+.gallery img{width:100%;height:100%;object-fit:cover;display:block}
+.gallery figcaption{position:absolute;left:8px;bottom:8px;font-family:var(--mono);font-size:11px;background:var(--surface);color:var(--ink);padding:3px 7px;border-radius:5px}
+@media (max-width:760px){.gallery{grid-template-columns:repeat(2,1fr)}}
+
+/* quotes */
+.quotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+blockquote{margin:0;padding:24px;border-left:4px solid var(--qc,var(--accent));background:var(--qb,var(--surface));border-radius:0 10px 10px 0;display:grid;gap:14px}
+.quotes blockquote:nth-child(1){--qc:#7E4AA8;--qb:#F4ECFB}
+.quotes blockquote:nth-child(2){--qc:#2F7F82;--qb:#E6F5F5}
+.quotes blockquote:nth-child(3){--qc:#3639FD;--qb:#E8EDFF}
+.quotes blockquote:nth-child(4){--qc:#B7791F;--qb:#FDF4E3}
+.quotes blockquote:nth-child(5){--qc:#0B7A60;--qb:#E3F5EE}
+.quotes blockquote:nth-child(6){--qc:#C2416B;--qb:#FCEBF1}
+.quotes blockquote cite b{color:var(--qc)}
+blockquote p{font-size:15.5px}
+blockquote cite{font-style:normal;font-size:13px;color:var(--muted)}
+blockquote cite b{color:var(--ink);font-weight:600;display:block}
+
+/* challenges list */
+.chal{border-top:1px solid var(--line)}
+.chal-row{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr) auto;gap:20px;padding:16px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.chal-row b{font-weight:600}
+.chal-row span{color:var(--muted);font-size:15px}
+.pill{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
+.t-ac{--tc:#7E4AA8;--tb:#F6F0FC}.t-ind{--tc:#3639FD;--tb:#EEF1FF}.t-nc{--tc:#2F7F82;--tb:#EAF6F6}.t-op{--tc:#B7791F;--tb:#FDF4E3}.t-en{--tc:#C2416B;--tb:#FCEBF1}
+.pill[class*="t-"]{background:var(--tb);color:var(--tc);font-style:normal;font-weight:600}
+.chal-row:has(.pill[class*="t-"]){padding-left:14px;box-shadow:inset 4px 0 0 var(--row-c,transparent)}
+.chal-row:has(.t-ac){--row-c:#7E4AA8}.chal-row:has(.t-ind){--row-c:#3639FD}.chal-row:has(.t-nc){--row-c:#2F7F82}.chal-row:has(.t-op){--row-c:#B7791F}.chal-row:has(.t-en){--row-c:#C2416B}
+.trk-row .trk:nth-child(1){--tc:#7E4AA8;--tb:#F6F0FC}.trk-row .trk:nth-child(2){--tc:#3639FD;--tb:#EEF1FF}.trk-row .trk:nth-child(3){--tc:#2F7F82;--tb:#EAF6F6}
+.trk-row .trk{border-top:4px solid var(--tc)}.trk-row .trk-ico{background:var(--tb)}.trk-row .trk-ico svg{stroke:var(--tc)}.trk-row .trk h3{color:var(--tc)}#tracks .trk .kicker{color:var(--tc)}#tracks .trk h3{color:var(--ink)}
+@media (max-width:640px){.chal-row{grid-template-columns:1fr auto}.chal-row span{grid-column:1 / -1}}
+
+/* timeline */
+.phases{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+.phase{padding:0 20px 0 0;position:relative}
+.phase .dot{width:14px;height:14px;border-radius:50%;background:var(--accent);margin-bottom:16px;box-shadow:0 0 0 4px var(--accent-soft)}
+.phase::before{content:"";position:absolute;left:14px;right:0;top:6px;height:2px;background:var(--line)}
+.phase:last-child::before{display:none}
+.phase .when{font-family:var(--mono);font-size:12px;color:var(--accent);margin-bottom:6px}
+.phase h3{font-size:17px;margin-bottom:6px}
+.phase p{color:var(--muted);font-size:14.5px}
+@media (max-width:820px){.phases{grid-template-columns:1fr;gap:28px}.phase::before{display:none}}
+
+/* schedule */
+.sched-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.sched{display:grid;grid-template-columns:repeat(3,minmax(250px,1fr));min-width:760px}
+.day{border-right:1px solid var(--line)}
+.day:last-child{border-right:none}
+.day-h{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:12px}
+.day-h .d{font-family:var(--display);font-size:38px;line-height:1;color:var(--accent)}
+.day-h .w{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.day-h .v{font-size:13px;color:var(--muted);margin-left:auto;text-align:right}
+.slot{display:grid;grid-template-columns:58px 1fr;gap:10px;padding:10px 20px;border-bottom:1px dashed var(--line);font-size:14.5px}
+.slot:last-child{border-bottom:none}
+.slot time{font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.slot.key{background:var(--accent-soft)}
+.slot.key span{font-weight:600}
+
+/* workshops */
+.ws .date{font-family:var(--display);font-size:22px;color:var(--ink)}
+.ws .mode{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+/* participant guide */
+.guide{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.guide ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.roles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:4px}
+.roles div{font-family:var(--mono);font-size:12.5px;padding:10px;border:1px dashed var(--accent);border-radius:8px;color:var(--ink);text-align:center}
+.criteria{display:flex;flex-wrap:wrap;gap:8px}
+.criteria span{font-size:13.5px;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:var(--bg)}
+
+/* team */
+.team{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.member{display:flex;gap:14px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);min-width:0}
+.av{flex:none;width:56px;height:56px;border-radius:12px;object-fit:cover;display:grid;place-items:center;font-family:var(--display);font-size:16px;background:var(--accent-soft);color:var(--accent)}
+.member b{display:block;font-size:15px;font-weight:600;line-height:1.3}
+.member span{font-size:13px;color:var(--muted);line-height:1.35;display:block}
+
+/* partners */
+.partners{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.partner{display:grid;gap:6px;padding:18px;border:1px solid var(--line);border-radius:12px;background:var(--surface);text-decoration:none;color:var(--ink);transition:border-color .15s}
+a.partner:hover{border-color:var(--accent)}
+.partner b{font-size:14.5px;font-weight:600;line-height:1.3}
+.plate{display:grid;place-items:center;height:84px;padding:12px 16px;border-radius:8px;background:#FFFFFF;margin-bottom:6px}
+.plate img{max-height:56px;max-width:100%;width:auto;object-fit:contain}
+.plate.text{font-family:var(--display);font-size:17px;color:#141430;text-align:center;line-height:1.1}
+.partner span{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+
+/* tiers */
+.title-tier{border:2px solid var(--accent);border-radius:16px;padding:32px;background:var(--surface);display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:32px;margin-bottom:20px}
+@media (max-width:760px){.title-tier{grid-template-columns:1fr}}
+.tier-name{font-family:var(--display);font-weight:400;font-size:26px;line-height:1.1}
+.price{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+.scarce{font-family:var(--mono);font-size:12px;color:var(--amber);text-transform:uppercase;letter-spacing:.06em}
+.perks{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.perks li{font-size:14.5px;color:var(--muted);padding-left:20px;position:relative}
+.perks li::before{content:"";position:absolute;left:2px;top:.6em;width:8px;height:8px;border-radius:2px;background:var(--accent)}
+.title-tier .perks{grid-template-columns:repeat(auto-fit,minmax(240px,1fr));column-gap:24px}
+.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:20px}
+.tier{border:1px solid var(--line);border-radius:14px;padding:24px;background:var(--surface);display:grid;gap:12px;align-content:start}
+.tier .tier-name{font-size:20px}
+.tier .price{font-size:20px}
+.tier.dash{border-style:dashed}
+.multi{display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:space-between;padding:28px 32px;border-radius:14px;background:var(--grad);color:#FFFFFF}
+.multi h3{font-family:var(--display);font-weight:400;font-size:22px;margin-bottom:6px}
+.multi p{max-width:60ch;font-size:15px;opacity:.92}
+.multi .big{font-family:var(--display);font-size:44px;line-height:1}
+.multi .big small{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+
+/* tier table */
+.tier-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.tier-table{width:100%;min-width:720px;border-collapse:collapse;font-size:14.5px}
+.tier-table th,.tier-table td{padding:13px 16px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
+.tier-table tbody tr:last-child th,.tier-table tbody tr:last-child td{border-bottom:none}
+.tier-table tbody th{text-align:left;font-weight:500;color:var(--ink);width:38%}
+.tier-table{table-layout:fixed}.tier-table thead th:first-child{width:38%}.tier-table thead th:nth-child(n+2){width:15.5%}
+.tier-table td{color:var(--accent);font-weight:700;font-size:16px}
+.tier-table thead th{vertical-align:bottom;padding-block:20px 16px}
+.tier-table thead .tier-name{display:block;font-size:18px}
+.tier-table thead .price{display:block;font-size:18px;margin-top:4px}
+.tier-table thead .price.small{font-size:12px;font-weight:500;color:var(--muted)}
+.tier-table .gold{background:var(--accent-soft)}
+
+.navlinks a[aria-current="page"]{color:var(--ink);background:var(--accent-soft)}
+.member.lead{border-color:var(--accent)}
+.navlinks a.nav-cta+a.nav-cta{margin-left:4px}
+.nav-cta[aria-current="page"]{background:var(--accent)!important;color:#FFFFFF!important}
+.nav-cta{color:var(--accent)!important;border:1px solid var(--accent)}
+.logo-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.logo-strip .plate{margin:0;height:76px}
+.logo-strip .plate img{max-height:44px}
+.logo-strip a.plate{border:1px solid var(--line);transition:border-color .15s,transform .15s}
+.logo-strip a.plate:hover{border-color:var(--accent);transform:translateY(-2px)}
+.faq-one{max-width:760px}
+.band .title .o{color:var(--band)}
+
+/* pies */
+.pies{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:28px}
+.pie-fig{margin:0;display:flex;gap:18px;align-items:center;min-width:0}
+.pie{flex:none;width:120px;height:120px;border-radius:50%;background:conic-gradient(var(--accent) 0 calc(var(--p)*1%),var(--accent-2) 0)}
+.pie span{display:none}
+.pie-fig figcaption{display:grid;gap:6px;font-size:13.5px;color:var(--muted);min-width:0}
+.pie-fig figcaption b{color:var(--ink);font-size:15px}
+.key{display:flex;gap:8px;align-items:center}
+.key i{flex:none;width:12px;height:12px;border-radius:3px}
+.key .k1{background:var(--accent)}.key .k2{background:var(--accent-2)}.key .k3{background:#7E4AA8}.key .k4{background:#B7791F}
+.pie.pie4{background:conic-gradient(#7E4AA8 0 12%,var(--accent-2) 0 27%,var(--accent) 0 82%,#B7791F 0)}
+
+/* disciplines */
+.disc{display:grid;gap:14px;min-width:0}
+.disc-h{font-size:15px}
+.disc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:480px){.disc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.disc-tile{display:grid;gap:8px;justify-items:start;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.disc-tile svg{width:28px;height:28px;fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.disc-tile span{font-size:13.5px;font-weight:500;line-height:1.3}
+.bg-row{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.bg-row span{flex:1;text-align:center;font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;padding:7px 4px;color:var(--muted);border-right:1px solid var(--line);min-width:0}
+.bg-row span:last-child{border-right:none}
+.disc-note{font-size:14px;color:var(--muted)}
+
+/* stages */
+.stages{list-style:none;margin:0 0 56px;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;position:relative}
+.stage{position:relative;display:grid;gap:10px;align-content:start;padding:24px;border:1px solid var(--line);border-radius:14px;background:var(--surface);min-width:0}
+.stage.main{border:2px solid var(--accent)}
+.stage:not(:last-child)::after{content:"→";position:absolute;right:-22px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:18px;color:var(--accent)}
+.stage-n{font-family:var(--mono);font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+.stage h3{font-size:18px;font-weight:600}
+.stage ul{margin:0;padding-left:18px;display:grid;gap:5px;color:var(--muted);font-size:14.5px}
+.stage-ex{font-size:13px;color:var(--ink);padding-top:10px;border-top:1px dashed var(--line)}
+.obj-h{font-size:14px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:500;margin-bottom:16px}
+@media (max-width:820px){.stages{grid-template-columns:1fr;gap:30px}.stage:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-26px;transform:translateX(-50%)}}
+
+/* carousel */
+.carousel{position:relative;margin-top:44px}
+.track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:14px;border:1px solid var(--line);overscroll-behavior-x:contain}
+.track::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;margin:0;scroll-snap-align:start;position:relative;aspect-ratio:3/1.6;max-width:100%}
+.slide img{width:100%;height:100%;object-fit:cover;display:block}
+.slide figcaption{position:absolute;left:12px;bottom:12px;max-width:calc(100% - 24px);font-family:var(--mono);font-size:12px;background:var(--surface);color:var(--ink);padding:5px 9px;border-radius:6px}
+.cbtn{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:18px;cursor:pointer;display:grid;place-items:center}
+.cbtn.prev{left:12px}.cbtn.next{right:12px}
+.cbtn:hover{border-color:var(--accent);color:var(--accent)}
+.dots{display:flex;justify-content:center;gap:0;margin-top:8px}
+.dot{position:relative;width:24px;height:24px;padding:0;border:none;background:none;cursor:pointer}
+.dot::before{content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;transform:translate(-50%,-50%);border-radius:999px;background:var(--line);transition:width .2s,background .2s}
+.dot.on::before{width:22px;background:var(--accent)}
+@media (max-width:640px){.slide{aspect-ratio:4/3}.cbtn{display:none}}
+@media (prefers-reduced-motion: reduce){.dot{transition:none}}
+
+/* sponsor cta */
+.sp-cta{margin-top:20px;display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.btn.btn-sm{padding:7px 14px;font-size:13.5px;border-radius:6px}
+.sp-cta h3{font-size:18px;font-weight:600}
+.sp-cta p{color:var(--muted);font-size:15px;margin-top:4px}
+.sp-cta-act{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.sp-mail{font-size:14px;color:var(--muted)}
+.sp-mail b{color:var(--ink);font-family:var(--mono);font-weight:500;user-select:all}
+
+.btn.vol{background:#2F7F82;border-color:#2F7F82;color:#FFFFFF}
+.btn.imp{background:#7E4AA8;border-color:#7E4AA8;color:#FFFFFF}
+
+.chip-link{text-decoration:none;transition:border-color .15s,color .15s}
+.chip-link:hover{border-color:var(--accent);color:var(--accent)}
+
+.legacy .card{border-top:5px solid var(--lc);background:var(--lb)}
+.legacy .card .kicker{color:var(--lc)}
+.legacy .card:nth-child(1){--lc:#7E4AA8;--lb:#F6F0FC}
+.legacy .card:nth-child(2){--lc:#3639FD;--lb:#EEF1FF}
+.legacy .card:nth-child(3){--lc:#2F7F82;--lb:#EAF6F6}
+
+/* hero facts */
+.fact-next{color:var(--ink)}
+.fact-next b{color:var(--accent);font-weight:600}
+.fact-last{margin-top:10px;justify-self:start;padding:5px 10px;border-radius:6px;background:var(--band);color:var(--muted);opacity:.75;font-size:12.5px}
+
+/* brand logo */
+.foot-brand{display:inline-flex;align-items:center;gap:8px}
+.foot-brand img{height:22px;width:auto}
+.brand{display:inline-flex;align-items:center;gap:10px;line-height:1}
+.brand-t{display:block;line-height:1;text-box:trim-both cap alphabetic}
+@supports not (text-box:trim-both cap alphabetic){.brand-t{padding-top:.12em}}
+.brand-mark{height:26px;width:auto;display:block}
+.hero-logo{display:flex;align-items:center;gap:clamp(16px,3vw,32px);margin:0 0 28px}
+.hero-mark{height:clamp(84px,14vw,156px);width:auto;flex:none}
+.hero-word{width:min(620px,100%);height:auto;min-width:0}
+img.dk{display:none}
+@media (max-width:480px){.brand-mark{height:26px}.hero-logo{gap:14px}}
+
+/* winners */
+.wins-head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:18px}
+.wins-title{font-family:var(--display);font-weight:400;font-size:clamp(22px,3vw,30px);line-height:1.1;margin-top:8px}
+.wins-nav{display:flex;gap:8px}
+.cbtn-s{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:16px;cursor:pointer}
+.cbtn-s:hover{border-color:var(--accent);color:var(--accent)}
+.win-track{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(280px,calc((100% - 40px)/3));gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+.win-track::-webkit-scrollbar{display:none}
+.wcount{font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;margin-right:6px}
+.wbtn{height:42px;min-width:42px;padding:0 14px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);font:inherit;font-weight:600;font-size:15px;cursor:pointer}
+.wbtn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.wbtn:disabled{opacity:.3;cursor:default}
+.wins-nav{align-items:center}
+.win-card{scroll-snap-align:start;display:grid;grid-template-rows:auto 1fr;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface);min-width:0}
+.win-top{aspect-ratio:16/9;background:var(--grad);color:#FFFFFF;padding:20px;display:flex;flex-direction:column;justify-content:space-between}
+.win-top.photo{padding:0;background:var(--accent-soft)}
+.win-top img{width:100%;height:100%;object-fit:cover;display:block}
+.win-ico{width:46px;height:46px;fill:none;stroke:#FFFFFF;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:.95}
+.win-chal{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.win-body{padding:22px;display:grid;gap:10px;align-content:start}
+.win-body h3{font-family:var(--display);font-weight:400;font-size:22px;line-height:1.1}
+.win-body p{color:var(--muted);font-size:14.5px}
+.win-links{display:flex;flex-wrap:wrap;gap:14px;margin-top:4px}
+.win-links a{font-weight:600;font-size:14px;text-decoration:none}
+.win-links a:hover{text-decoration:underline}
+@media (max-width:640px){.win-track{grid-auto-columns:88%}.wins-head{flex-wrap:wrap}}
+
+/* tier colours */
+.tier-table .gold{background:transparent}
+.tier-table tr>:nth-child(2){--c:var(--gold);--cb:var(--gold-bg)}
+.tier-table tr>:nth-child(3){--c:var(--silver);--cb:var(--silver-bg)}
+.tier-table tr>:nth-child(4){--c:var(--bronze);--cb:var(--bronze-bg)}
+.tier-table tr>:nth-child(5){--c:var(--cp);--cb:var(--cp-bg)}
+.tier-table tr>:nth-child(n+2){background:var(--cb);color:var(--c)}
+.tier-table thead th:nth-child(n+2){border-top:5px solid var(--c)}
+.tier-table thead th:nth-child(n+2) .tier-name,.tier-table thead th:nth-child(n+2) .price{color:var(--c)}
+.tier-table td+td,.tier-table th+td,.tier-table thead th+th{border-left:2px solid var(--surface)}
+
+/* film */
+.film{padding-block:8px 24px}
+.film-in{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:36px;align-items:center}
+.film-poster{position:relative;display:block;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:var(--grad)}
+.film-poster img{width:100%;height:100%;object-fit:cover;display:block;opacity:.72;transition:opacity .2s}
+.film-poster:hover img{opacity:.6}
+.play{position:absolute;inset:0;margin:auto;width:76px;height:76px;border-radius:50%;background:#FFFFFF;display:grid;place-items:center;box-shadow:0 6px 24px rgba(0,0,0,.25);transition:transform .2s}
+.film-poster:hover .play{transform:scale(1.06)}
+.play svg{width:32px;height:32px;fill:var(--accent);margin-left:4px}
+.film-txt{display:grid;gap:12px;justify-items:start}
+.film-txt h2{font-family:var(--display);font-weight:400;font-size:clamp(26px,3.6vw,38px);line-height:1.05}
+@media (max-width:760px){.film-in{grid-template-columns:1fr;gap:20px}}
+@media (prefers-reduced-motion: reduce){.film-poster img,.play{transition:none}}
+
+/* stage colours */
+.stages .stage:nth-child(1){--sc:#7E4AA8;--sb:#F6F0FC}
+.stages .stage:nth-child(2){--sc:#3639FD;--sb:#EEF1FF}
+.stages .stage:nth-child(3){--sc:#2F7F82;--sb:#EAF6F6}
+.stages .stage{background:var(--sb);border:1px solid color-mix(in srgb,var(--sc) 25%,transparent);border-top:5px solid var(--sc)}
+.stages .stage.main{border:2px solid var(--sc);border-top:5px solid var(--sc)}
+.stages .stage .stage-n{color:var(--sc)}
+.stages .stage .stage-ex{border-top-color:color-mix(in srgb,var(--sc) 30%,transparent)}
+.stages .stage:not(:last-child)::after{color:var(--sc)}
+
+/* about icons */
+.ico{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.stage-top{display:flex;align-items:center;gap:12px}
+.stage-top .ico{width:44px;height:44px;padding:9px;border-radius:12px;background:#FFFFFF;color:var(--sc);border:1px solid color-mix(in srgb,var(--sc) 25%,transparent)}
+#about .g3 .card>.ico{width:42px;height:42px;padding:9px;border-radius:50%;background:var(--accent-soft);color:var(--accent);margin-bottom:4px}
+
+.disc-grid.compact{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.disc-grid.compact .disc-tile{padding:10px;gap:6px;background:var(--band)}
+.disc-grid.compact .disc-tile svg{width:22px;height:22px}
+.disc-grid.compact .disc-tile span{font-size:12.5px}
+.pies.mini{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+.pies.mini .pie-fig{gap:10px;align-items:flex-start}
+.pies.mini .pie{width:60px;height:60px}
+.pies.mini figcaption{font-size:12px;gap:3px}
+.pies.mini figcaption b{font-size:13px}
+.pies.mini .key{gap:6px}.pies.mini .key i{width:10px;height:10px}
+@media (max-width:480px){.pies.mini .pie-fig{flex-direction:column}}
+@media (max-width:480px){.disc-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* sponsor tracks */
+.tracks-sp{display:grid;gap:14px;margin-bottom:48px}
+.tracks-h{font-family:var(--display);font-weight:400;font-size:clamp(22px,3vw,30px);line-height:1.1}
+.trk-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:6px}
+.trk{display:grid;gap:10px;justify-items:center;text-align:center;align-content:start;padding:26px 22px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:0 4px 14px rgba(24,24,27,.05)}
+.trk-ico{width:56px;height:56px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center}
+.trk-ico svg{width:26px;height:26px;fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.trk h3{font-size:17px;font-weight:600}
+.trk p{color:var(--muted);font-size:14.5px}
+@media (max-width:820px){.trk-row{grid-template-columns:1fr}}
+
+.src-list{list-style:none;margin:2px 0;padding:0;display:grid;gap:8px}
+.src-list li{display:grid;gap:2px;padding:10px 12px 10px 14px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0}
+.src-list b{color:var(--ink);font-size:14.5px;font-weight:600}
+.src-list span{color:var(--muted);font-size:13.5px}
+
+/* acknowledgements */
+.ack{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;align-items:start}
+.ack-col{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;min-width:0}
+.ack-col h4{margin:0 0 12px;font-family:var(--mono);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+.ack-col ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.ack-col li{display:grid;gap:2px}
+.ack-col b{font-size:15px;font-weight:600}
+.ack-col span{font-size:13.5px;color:var(--muted)}
+.ack-note{margin-top:24px;max-width:72ch;color:var(--muted);font-size:15px}
+
+/* stats v2 */
+.stat-group{display:grid;gap:10px}
+.stat-group+.stat-group{margin-top:22px}
+.stat-h{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.stat-group .stats{border:none;background:none;gap:14px;border-radius:0;overflow:visible}
+.stat-group .stat{border:1px solid var(--line)!important;border-radius:12px;background:var(--surface);display:grid;gap:4px;align-content:start;padding:20px}
+.stat-group.g0 .stat{--sc:#3639FD;--sb:#EEF1FF}
+.stat-group.g1 .stat{--sc:#2F7F82;--sb:#EAF6F6}
+.stat-ico{width:40px;height:40px;padding:8px;border-radius:10px;background:var(--sb);fill:none;stroke:var(--sc);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;margin-bottom:8px}
+.stat-group .stat .n{color:var(--sc)}
+.stat-group .stat .l{margin-top:6px;color:var(--ink);font-weight:600}
+.stat-group .stat .d{font-size:13.5px;color:var(--muted)}
+@media (max-width:720px){.stat-group .stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* mobile fixes */
+@media (max-width:640px){
+  .tier-table{min-width:0;font-size:12.5px;table-layout:fixed}
+  .tier-table th,.tier-table td{padding:9px 4px}
+  .tier-table thead th:first-child{width:34%}
+  .tier-table thead th{overflow-wrap:normal}
+  .tier-table th,.tier-table td{overflow-wrap:anywhere;hyphens:auto}
+  .tier-table td+td,.tier-table th+td,.tier-table thead th+th{border-left-width:1px}
+  .tier-table tbody th{padding-left:10px;font-size:12px;line-height:1.35}
+  .tier-table thead th{padding-block:12px 10px}
+  .tier-table thead .tier-name{font-size:11px;line-height:1.2}
+  .tier-table thead .price{font-size:11px}
+  .tier-table thead .price.small{font-size:10px}
+  .tier-table td{font-size:14px}
+}
+/* mobile menu */
+.menu-btn{display:none}
+@media (max-width:760px){
+  .nav .wrap{position:relative}
+  .menu-btn{display:inline-flex;align-items:center;gap:6px;margin-left:auto;height:36px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.06em;cursor:pointer}
+  .nav:not(.open) .navlinks{display:none}
+  .nav.open .navlinks{position:absolute;top:56px;left:0;right:0;flex-direction:column;gap:2px;margin:0;padding:10px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px));background:var(--bg);border-bottom:1px solid var(--line);box-shadow:0 10px 24px rgba(24,24,27,.08)}
+  .nav.open .navlinks a{padding:11px 10px;font-size:13px}
+  .nav.open .navlinks a.nav-cta{text-align:center;margin-top:6px}
+}
+
+/* impact summary */
+.impact-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:28px}
+.impact-strip figure{margin:0;position:relative;border-radius:12px;overflow:hidden;aspect-ratio:4/3;background:var(--accent-soft)}
+.impact-strip img{width:100%;height:100%;object-fit:cover;display:block}
+.impact-strip figcaption{position:absolute;left:10px;bottom:10px;font-family:var(--mono);font-size:11.5px;background:var(--surface);color:var(--ink);padding:4px 8px;border-radius:6px}
+.award{margin-top:24px;display:flex;gap:18px;align-items:center;padding:20px 24px;border-radius:12px;background:#FDF4E3;border:1px solid #F1DDB4;border-left:5px solid #B7791F}
+.award-ico{flex:none;width:56px;height:56px;border-radius:50%;background:#FFFFFF;display:grid;place-items:center;box-shadow:0 2px 8px rgba(183,121,31,.18)}
+.award-ico svg{width:28px;height:28px;fill:none;stroke:#B7791F;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.award-k{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8A5A12;font-weight:600}
+.award h3{font-size:19px;font-weight:600;margin:4px 0 4px}
+.award p{color:var(--muted);font-size:15px;max-width:70ch}
+.award-txt{flex:1}
+.award-img{flex:none;width:150px;height:160px;object-fit:cover;border-radius:10px;border:3px solid #FFFFFF;box-shadow:0 4px 14px rgba(183,121,31,.22)}
+@media (max-width:520px){.award{flex-direction:column;align-items:flex-start}.award-img{width:100%;height:auto;aspect-ratio:15/16}}
+.impact-cta{margin-top:24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;padding:20px 24px;border-radius:12px;background:var(--grad);color:#FFFFFF}
+.impact-cta p{font-size:16px;max-width:52ch}
+.impact-cta .btn.primary{background:#FFFFFF;border-color:#FFFFFF;color:var(--accent)}
+@media (max-width:640px){.impact-strip{grid-template-columns:1fr 1fr}.impact-strip figure:last-child{grid-column:1 / -1;aspect-ratio:16/9}}
+
+/* winners: show all */
+.win-track{grid-auto-flow:row;grid-auto-columns:auto;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;overflow:visible;scroll-snap-type:none}
+@media (min-width:1000px){.win-track{grid-template-columns:repeat(4,minmax(0,1fr))}.win-top{aspect-ratio:16/8}.win-body{padding:18px}}
+@media (max-width:640px){.win-track{grid-template-columns:1fr;grid-auto-columns:auto}}
+
+/* 2026 page consistency */
+.ed-head{display:flex;align-items:center;gap:clamp(14px,2.5vw,24px);margin-bottom:28px}
+.ed-mark{height:clamp(64px,9vw,104px);width:auto;flex:none}
+.ed-title{font-family:var(--display);font-weight:400;font-size:clamp(34px,6vw,64px);line-height:1;margin-top:8px}
+.phases .phase:nth-child(1){--pc:#55606E}
+.phases .phase:nth-child(2){--pc:#7E4AA8}
+.phases .phase:nth-child(3){--pc:#3639FD}
+.phases .phase:nth-child(4){--pc:#2F7F82}
+.phases .phase .dot{background:var(--pc);box-shadow:0 0 0 4px color-mix(in srgb,var(--pc) 18%,transparent)}
+.phases .phase .when{color:var(--pc)}
+.ws.card{border-top:5px solid var(--wc);background:var(--wb)}
+.ws.card .mode{color:var(--wc)}
+.ws.card:nth-child(1){--wc:#7E4AA8;--wb:#F6F0FC}
+.ws.card:nth-child(2){--wc:#B7791F;--wb:#FDF4E3}
+.ws.card:nth-child(3){--wc:#C2416B;--wb:#FCEBF1}
+#tracks .trk .kicker{margin-top:2px}
+
+/* participant guide colours */
+.guide{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (min-width:1100px){.guide{grid-template-columns:repeat(4,minmax(0,1fr))}.guide .card{padding:22px}.guide .roles{grid-template-columns:1fr 1fr}.guide .roles div{font-size:11.5px;padding:8px 4px}}
+@media (max-width:640px){.guide{grid-template-columns:1fr}}
+.guide .card{border-top:5px solid var(--gc);background:var(--gb)}
+.guide .card:nth-child(1){--gc:#7E4AA8;--gb:#F6F0FC}
+.guide .card:nth-child(2){--gc:#3639FD;--gb:#EEF1FF}
+.guide .card:nth-child(3){--gc:#2F7F82;--gb:#EAF6F6}
+.guide .card:nth-child(4){--gc:#B7791F;--gb:#FDF4E3}
+.guide .card:nth-child(5){--gc:#0B7A60;--gb:#E3F5EE}
+.guide .card:nth-child(6){--gc:#C2416B;--gb:#FCEBF1}
+.guide .card:nth-child(7){--gc:#5B4BD6;--gb:#EFEDFC}
+.guide .card:nth-child(8){--gc:#9C4F22;--gb:#F8E8DC}
+.g-head{display:flex;align-items:center;gap:12px}
+.g-ico{flex:none;width:42px;height:42px;border-radius:10px;background:#FFFFFF;border:1px solid color-mix(in srgb,var(--gc) 25%,transparent);display:grid;place-items:center}
+.g-ico svg{width:22px;height:22px;fill:none;stroke:var(--gc);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.guide ul{list-style:none;padding-left:0}
+.guide ul li{position:relative;padding-left:16px}
+.guide ul li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:7px;border-radius:2px;background:var(--gc)}
+.guide .card a{color:var(--gc);font-weight:600}
+.guide .roles div{border-color:var(--gc);background:#FFFFFF}
+.guide .criteria span{background:#FFFFFF}
+
+/* pre-deploy fixes */
+.swipe-hint{display:none}
+@media (max-width:800px){.swipe-hint{display:inline;color:var(--accent)}}
+@media (max-width:640px){.partners{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.partner{padding:12px}.partner .plate{height:64px;padding:8px}.partner .plate img{max-height:40px}.partner b{font-size:13px}.partner span{font-size:10.5px}}
+
+/* faq */
+.faqs{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:40px;align-items:start}
+@media (max-width:400px){.faqs{grid-template-columns:1fr}}
+.faqs h3{font-size:14px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px;font-weight:500}
+details{border-bottom:1px solid var(--line)}
+details:first-of-type{border-top:1px solid var(--line)}
+summary{cursor:pointer;list-style:none;padding:16px 32px 16px 0;font-weight:600;font-size:15.5px;position:relative}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";position:absolute;right:4px;top:12px;font-family:var(--mono);font-size:20px;color:var(--accent)}
+details[open] summary::after{content:"–"}
+.ans{padding:0 0 18px;color:var(--muted);font-size:15px;display:grid;gap:10px}
+.ans ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.ans b{color:var(--ink)}
+
+/* contact/footer */
+.contact{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:32px;align-items:center}
+.contact h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,44px);line-height:1.05}
+.email{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:18px}
+.email code{font-family:var(--mono);font-size:16px;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);user-select:all}
+.copy{font:inherit;font-size:14px;font-weight:600;padding:10px 14px;border-radius:8px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer}
+.links{display:grid;gap:8px}
+.links a{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);font-weight:500}
+.links a span{font-family:var(--mono);font-size:12.5px;color:var(--muted);text-align:right;overflow-wrap:anywhere}
+.links a:hover{color:var(--accent)}
+.links a.soon{color:var(--muted);cursor:default}
+.links a.soon:hover{color:var(--muted)}
+.links a.soon span{font-style:italic}
+footer{border-top:1px solid var(--line);padding-block:28px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+</style>
+
+<nav class="nav" aria-label="Sections">
+  <div class="wrap">
+    <a class="brand" href="#home"><img class="brand-mark lt" src="img/brand/mark-blue.png" alt=""><img class="brand-mark dk" src="img/brand/mark-light.png" alt="" aria-hidden="true"><span class="brand-t">Edinburgh <span>BioHackathon</span></span></a>
+    <button type="button" class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navlinks">Menu</button>
+    <div class="navlinks" data-nav="home">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#sponsor">Sponsor 2027</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+      <a href="#team">Team</a>
+      <a href="#impact-page" class="nav-cta">Impact</a>
+      <a href="#edition-2026" class="nav-cta">2026 edition</a>
+    </div>
+    <div class="navlinks" data-nav="impact-page" hidden>
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#sponsor">Sponsor 2027</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+      <a href="#team">Team</a>
+      <a href="#impact-page" class="nav-cta" aria-current="page">Impact</a>
+      <a href="#edition-2026" class="nav-cta">2026 edition</a>
+    </div>
+    <div class="navlinks" data-nav="edition-2026" hidden>
+      <a href="#home">Home</a>
+      <a href="#tracks">Challenges</a>
+      <a href="#programme">Programme</a>
+      <a href="#guide">Participants</a>
+      <a href="#team">Team</a>
+      <a href="#partners">Partners</a>
+      <a href="#faq-2026">FAQ</a>
+    </div>
+    <div class="navlinks" data-nav="team-page" hidden>
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#sponsor">Sponsor 2027</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+      <a href="#team" aria-current="page">Team</a>
+      <a href="#impact-page" class="nav-cta">Impact</a>
+      <a href="#edition-2026" class="nav-cta">2026 edition</a>
+    </div>
+  </div>
+</nav>
+
+<main id="home" data-view="home">
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="status">
+      <a class="chip chip-link" href="#edition-2026">2026 · 100+ researchers, 7 challenges →</a>
+      <span class="chip live">2027 · spring / early summer</span>
+    </div>
+    <h1 class="hero-logo"><img class="hero-mark lt" src="img/brand/mark-blue.png" alt=""><img class="hero-mark dk" src="img/brand/mark-light.png" alt="" aria-hidden="true"><img class="hero-word lt" src="img/brand/wordmark.png" alt="Edinburgh BioHackathon"><img class="hero-word dk" src="img/brand/wordmark-light.png" alt="" aria-hidden="true"></h1>
+    <div class="hero-meta">
+      <p class="tag">Building a collaborative Bio-AI innovation community. Scotland's first student-led biohackathon.</p>
+      <div class="facts">
+        <div class="fact-next"><b>Next edition</b> · spring / early summer 2027</div>
+        <div>University of Edinburgh · independent, student-led</div>
+        <div class="fact-last">Last edition · 20–22 March 2026</div>
+      </div>
+    </div>
+    <div class="ctas">
+      <a class="btn primary" href="#sponsor">Sponsor 2027</a>
+      <a class="btn vol" href="mailto:biohackathon@ed.ac.uk?subject=Volunteering%20for%20Edinburgh%20BioHackathon%202027">Volunteer to help</a>
+      <a class="btn imp" href="#impact-page">See our impact →</a>
+      <a class="btn" href="#edition-2026">Explore the 2026 edition →</a>
+    </div>
+    <div class="carousel" aria-roledescription="carousel" aria-label="2026 photos">
+      <div class="track" id="track" tabindex="0"><figure class="slide" id="s0"><img src="img/quas.jpg" alt="Quas Drinks with the organising committee"><figcaption>Quas Drinks with the organising committee</figcaption></figure><figure class="slide" id="s1"><img loading="lazy" src="img/teams.jpg" alt="Teams at work in the Nucleus"><figcaption>Teams at work in the Nucleus</figcaption></figure><figure class="slide" id="s2"><img loading="lazy" src="img/hacking.jpg" alt="Hacking on Saturday"><figcaption>Hacking on Saturday</figcaption></figure><figure class="slide" id="s3"><img loading="lazy" src="img/discussion.jpg" alt="Teams working through a challenge"><figcaption>Teams working through a challenge</figcaption></figure><figure class="slide" id="s4"><img loading="lazy" src="img/judging.jpg" alt="Pitching to the judges"><figcaption>Pitching to the judges</figcaption></figure><figure class="slide" id="s5"><img loading="lazy" src="img/qa.jpg" alt="Mentors and teams in discussion"><figcaption>Mentors and teams in discussion</figcaption></figure><figure class="slide" id="s6"><img loading="lazy" src="img/lab1.jpg" alt="Lab visit during the weekend"><figcaption>Lab visit during the weekend</figcaption></figure><figure class="slide" id="s7"><img loading="lazy" src="img/breakfast.jpg" alt="Breakfast in the Nucleus"><figcaption>Breakfast in the Nucleus</figcaption></figure></div>
+      <button type="button" class="cbtn prev" id="cprev" aria-label="Previous photo">←</button>
+      <button type="button" class="cbtn next" id="cnext" aria-label="Next photo">→</button>
+    </div>
+    <div class="dots" id="dots"><button type="button" class="dot on" data-i="0" aria-label="Photo 1"></button><button type="button" class="dot" data-i="1" aria-label="Photo 2"></button><button type="button" class="dot" data-i="2" aria-label="Photo 3"></button><button type="button" class="dot" data-i="3" aria-label="Photo 4"></button><button type="button" class="dot" data-i="4" aria-label="Photo 5"></button><button type="button" class="dot" data-i="5" aria-label="Photo 6"></button><button type="button" class="dot" data-i="6" aria-label="Photo 7"></button><button type="button" class="dot" data-i="7" aria-label="Photo 8"></button></div>
+  </div>
+</header>
+
+<section class="film" id="film">
+  <div class="wrap film-in">
+    <a class="film-poster" href="https://youtu.be/0IslmyI-aN4" target="_blank" rel="noopener" aria-label="Watch the Edinburgh BioHackathon 2026 film on YouTube">
+      <img src="img/cohort.jpg" alt="The 2026 cohort at the opening ceremony" loading="lazy">
+      <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+    </a>
+    <div class="film-txt">
+      <span class="eyebrow">Watch</span>
+      <h2>The 2026 film</h2>
+      <p class="lede">See what 48 hours of hacking, mentoring and pitching looked like at Scotland's first student-led biohackathon.</p>
+      <a class="btn primary btn-sm" href="https://youtu.be/0IslmyI-aN4" target="_blank" rel="noopener">Watch on YouTube ↗</a>
+      <p class="caption">Film by Javier Mazo</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="impact">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Our impact · 2026 edition</span>
+      <h2>One weekend. 100+ researchers.</h2>
+      <p class="lede">The first edition drew applications from across the UK, and almost everyone selected stayed for the full weekend.</p>
+    </div>
+    <div class="stat-group g0"><span class="stat-h">Who came</span><div class="stats"><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/></svg><div class="n">350</div><div class="l">Applications</div><div class="d">from across the UK</div></div><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9.5" r="2.4"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M15 14.2c2.9-.4 5.5 1.4 5.8 4.8"/></svg><div class="n">100+</div><div class="l">Participants</div><div class="d">selected on merit</div></div><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 4l9 5.5-9 5.5z"/><path d="M7 12v4.5c3 2 7 2 10 0V12"/></svg><div class="n">14</div><div class="l">UK universities</div><div class="d">represented in the cohort</div></div><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16.5 9.5"/></svg><div class="n">&gt;95%</div><div class="l">Attendance</div><div class="d">stayed the full weekend</div></div></div></div>
+    <div class="stat-group g1"><span class="stat-h">What we built it with</span><div class="stats"><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></svg><div class="n">7</div><div class="l">Challenges</div><div class="d">from labs and industry</div></div><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12l4-4 4 3 3-3 3 1 4 4-5 5-3-2-2 2-3-1z"/><path d="M11 11l3 3"/></svg><div class="n">15</div><div class="l">Sponsors &amp; partners</div><div class="d">funding, compute, prizes</div></div><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg><div class="n">15</div><div class="l">Judges &amp; mentors</div><div class="d">gave up their weekend</div></div><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4M7 9l2 2-2 2M11 13h5"/></svg><div class="n">3</div><div class="l">Workshops</div><div class="d">Git, HPC and IP training</div></div></div></div>
+
+    <div class="award">
+      <span class="award-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M9 21h6M10 17h4v4h-4z"/></svg></span>
+      <div class="award-txt"><span class="award-k">Award winner · June 2026</span><h3>PGR Impact Award</h3><p>Our 2026 organising committee received the PGR Impact Award from the School of Biological Sciences, University of Edinburgh, at the Postgraduate Research Student Symposium.</p></div>
+      <img class="award-img" src="img/pgr-award.jpg" alt="Two committee members holding the PGR Impact Award certificate" loading="lazy">
+    </div>
+    <div class="impact-strip">
+      <figure><img src="img/teams.jpg" alt="Teams at work in the Nucleus" loading="lazy"><figcaption>Teams at work</figcaption></figure>
+      <figure><img src="img/judging.jpg" alt="A team pitching to the judges" loading="lazy"><figcaption>Pitching to judges</figcaption></figure>
+      <figure><img src="img/filament.jpg" alt="Filament Fillies presenting their winning tool" loading="lazy"><figcaption>Winning project: Filament Fillies</figcaption></figure>
+    </div>
+    <div class="impact-cta">
+      <p>See who took part, the eight winning projects, photos and what people said.</p>
+      <a class="btn primary" href="#impact-page">See our full impact →</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" id="supporters">
+  <div class="wrap">
+    <div class="sec-head" style="margin-bottom:28px"><span class="eyebrow">Supported by</span><h2>Our 2026 sponsors &amp; partners</h2></div>
+    <div class="logo-strip"><a class="plate" href="https://aibio.ac.uk/about/" target="_blank" rel="noopener" title="AIBIO-UK"><img src="img/logos/aibio.png" alt="AIBIO-UK logo" loading="lazy"></a><a class="plate" href="https://www.ailurus.bio/about" target="_blank" rel="noopener" title="Ailurus"><img src="img/logos/ailurus.png" alt="Ailurus logo" loading="lazy"></a><a class="plate" href="https://www.amytis.io/" target="_blank" rel="noopener" title="Amytis"><img src="img/logos/amytis.png" alt="Amytis logo" loading="lazy"></a><a class="plate" href="https://www.aphelionspace.org/" target="_blank" rel="noopener" title="Aphelion Industries"><img src="img/logos/aphln.png" alt="Aphelion Industries logo" loading="lazy"></a><a class="plate" href="https://www.chai.ac.uk/" target="_blank" rel="noopener" title="CHAI Hub"><img src="img/logos/chai.png" alt="CHAI Hub logo" loading="lazy"></a><a class="plate" href="https://digitalresearchservices.ed.ac.uk/" target="_blank" rel="noopener" title="Digital Research Services"><img src="img/logos/drs.png" alt="Digital Research Services logo" loading="lazy"></a><a class="plate" href="https://edinburgh-innovations.ed.ac.uk/" target="_blank" rel="noopener" title="Edinburgh Innovations"><img src="img/logos/ei.png" alt="Edinburgh Innovations logo" loading="lazy"></a><a class="plate" href="https://www.hackathons.org.uk/" target="_blank" rel="noopener" title="Hackathons UK"><img src="img/logos/huk.svg" alt="Hackathons UK logo" loading="lazy"></a><a class="plate" href="https://www.openbiosim.org/" target="_blank" rel="noopener" title="OpenBioSim"><img src="img/logos/openbiosim.svg" alt="OpenBioSim logo" loading="lazy"></a><a class="plate" href="https://www.oxbridgefrontier.com/" target="_blank" rel="noopener" title="Oxbridge Frontier Intelligence"><img src="img/logos/ofi.png" alt="Oxbridge Frontier Intelligence logo" loading="lazy"></a><a class="plate" href="https://www.pacifico.bio/" target="_blank" rel="noopener" title="Pacifico Biolabs"><img src="img/logos/pacifico.svg" alt="Pacifico Biolabs logo" loading="lazy"></a><a class="plate" href="https://quasdrinks.co.uk/" target="_blank" rel="noopener" title="Quas Drinks"><img src="img/logos/quas.png" alt="Quas Drinks logo" loading="lazy"></a><a class="plate" href="https://www.ph.ed.ac.uk" target="_blank" rel="noopener" title="School of Physics &amp; Astronomy"><img src="img/logos/ph.png" alt="School of Physics &amp; Astronomy logo" loading="lazy"></a><a class="plate" href="https://www.ed.ac.uk/student-experience-grants" target="_blank" rel="noopener" title="Student Experience Grants"><img src="img/logos/experience-grants.png" alt="Student Experience Grants logo" loading="lazy"></a><a class="plate" href="https://sulsa.ac.uk/" target="_blank" rel="noopener" title="SULSA"><img src="img/logos/sulsa.png" alt="SULSA logo" loading="lazy"></a></div>
+    <p class="caption" style="margin-top:16px"><a href="#partners">See every partner and what they contributed →</a></p>
+  </div>
+</section>
+
+<section class="sec" id="about">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">More than a hackathon</span>
+      <h2>The Bio-Innovation Series</h2>
+      <p class="lede">The weekend sits inside a longer programme. Participants train before it and keep building after it, with biologists, programmers and industry partners working side by side throughout.</p>
+    </div>
+    <ol class="stages">
+      <li class="stage">
+        <div class="stage-top"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5C5.5 5 8.5 5 12 7c3.5-2 6.5-2 9-.5V19c-2.5-1.5-5.5-1.5-9 .5-3.5-2-6.5-2-9-.5z"/><path d="M12 7v12.5"/></svg><span class="stage-n">Before · weeks ahead</span></div>
+        <h3>Pre-hackathon workshops &amp; training</h3>
+        <ul><li>Technical training: Git &amp; GitHub, HPC on Eddie, Python</li><li>Intellectual property and commercialisation basics</li><li>Q&amp;A sessions and team matchmaking</li></ul>
+        <p class="stage-ex">2026: three workshops with Edinburgh Innovations, CIIE and Digital Research Services</p>
+      </li>
+      <li class="stage main">
+        <div class="stage-top"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span class="stage-n">The weekend · 48 hours</span></div>
+        <h3>BioHackathon</h3>
+        <ul><li>Real challenges from academic labs and industry</li><li>Interdisciplinary teams of 4–6</li><li>Mentors on hand, final pitches to expert judges, prizes</li></ul>
+        <p class="stage-ex">2026: 100+ participants, 7 challenge tracks, 15 judges &amp; mentors</p>
+      </li>
+      <li class="stage">
+        <div class="stage-top"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2"/><path d="M9 15l-3-3c1.5-4 5-8.5 12-9 -.5 7-5 10.5-9 12z"/><circle cx="14.5" cy="9.5" r="1.6"/><path d="M6 12H3l3-4h4M12 18v3l4-3v-4"/></svg><span class="stage-n">After · following weeks</span></div>
+        <h3>Post-hackathon workshops &amp; continuation</h3>
+        <ul><li>Entrepreneurship and commercialisation workshops</li><li>Mentoring to refine projects beyond the prototype</li><li>Routes to incubators, funding and collaborations</li></ul>
+        <p class="stage-ex">2026: ran from the closing ceremony to late April</p>
+      </li>
+    </ol>
+    <h3 class="obj-h">What the series is for</h3>
+    <div class="g3">
+      <div class="card"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9.5" r="2.4"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M15 14.2c2.9-.4 5.5 1.4 5.8 4.8"/></svg><span class="kicker">Objective</span><h3>Build a cross-disciplinary innovation community</h3><p>Unite life scientists and programmers through collaborative problem-solving on real biological and computational challenges.</p></div>
+      <div class="card"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 4l9 5.5-9 5.5z"/><path d="M7 12v4.5c3 2 7 2 10 0V12"/><path d="M21 9.5V15"/></svg><span class="kicker">Objective</span><h3>Foster academia–industry partnerships</h3><p>Co-design challenges with academic and industrial partners, exposing students to authentic problem-based learning and professional mentoring.</p></div>
+      <div class="card"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20c4 0 4-6 8-6s4-6 8-6"/><circle cx="4" cy="20" r="1.6"/><circle cx="20" cy="8" r="1.6"/><path d="M17 4h4v4"/></svg><span class="kicker">Objective</span><h3>Create sustainable pathways for innovation</h3><p>Post-event mentoring and support for project continuation, growing into a recurring Bio-Innovation Series.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" id="sponsor">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Meet candidates while they build</span>
+      <h2>Sponsorship 2027</h2>
+      <p class="lede">A careers fair and a 48-hour assessment centre in one. See how people think, collaborate and build under pressure. Challenge providers get prototype solutions to real problems, and sponsors can have teams build on their APIs, software or compute for real developer feedback.</p>
+    </div>
+
+    <div class="tracks-sp">
+      <h3 class="tracks-h">Challenge tracks</h3>
+      <p class="lede">Sponsors can set a challenge in any of the three tracks.</p>
+      <div class="trk-row"><div class="trk"><span class="trk-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6L4.6 18.8A1.5 1.5 0 0 0 5.9 21h12.2a1.5 1.5 0 0 0 1.3-2.2L14 9V3M7 15h10"/></svg></span><h3>Academic Research Track</h3><p>Open research problems from academic labs, with real datasets and academic mentors.</p></div><div class="trk"><span class="trk-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 9h5a1 1 0 0 1 1 1v11M3 21h18M7.5 8h3M7.5 12h3M7.5 16h3M16.5 13h1M16.5 17h1"/></svg></span><h3>Industry Innovation Track</h3><p>Practical challenges from biotech, health and data companies, built into working prototypes.</p></div><div class="trk"><span class="trk-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H9l-3.5 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M16 9h4a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-1v3l-3.5-3H11a1 1 0 0 1-1-1v-1"/></svg></span><h3>Non-Coder Problem-Solving Track</h3><p>Experimental design, strategy and storytelling, for participants without a coding background.</p></div></div>
+      <p class="caption">Teams in each track compete in a final presentation and pitch session, with winners selected by a judging panel.</p>
+    </div>
+
+    <div class="g2" style="margin-bottom:48px">
+      <div class="card">
+        <span class="kicker">Who's in the room</span>
+        <h3>An interdisciplinary cohort, by design</h3>
+        <p>Balanced teams of 4–6 across wet-lab, dry-lab, computational and non-coding disciplines, from 14 universities including UCL, Cambridge, Imperial, Glasgow, St Andrews and Dundee.</p>
+        <div class="disc-grid compact"><div class="disc-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="13.5" cy="10.5" r="3"/><circle cx="8" cy="15" r="1"/></svg><span>Biology, medicine &amp; life sciences</span></div><div class="disc-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3c0 4.5 8 4.5 8 9s-8 4.5-8 9M16 3c0 4.5-8 4.5-8 9s8 4.5 8 9M9.5 7.5h5M9.5 16.5h5"/></svg><span>Bioinformatics</span></div><div class="disc-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 6l-3 12"/></svg><span>Computer science &amp; AI</span></div><div class="disc-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" transform="rotate(120 12 12)"/></svg><span>Physics &amp; maths</span></div><div class="disc-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6L4.6 18.8A1.5 1.5 0 0 0 5.9 21h12.2a1.5 1.5 0 0 0 1.3-2.2L14 9V3M7 15h10"/></svg><span>Chemistry</span></div><div class="disc-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M5 16l5-5 4 3 6-7M15 7h5v5"/></svg><span>Business</span></div></div>
+        <div class="pies mini" aria-label="2026 cohort">
+          <figure class="pie-fig"><div class="pie" style="--p:52" role="img" aria-label="52% University of Edinburgh, 48% other UK universities"></div>
+            <figcaption><b>Where they came from</b><span class="key"><i class="k1"></i>Edinburgh · 52%</span><span class="key"><i class="k2"></i>Other UK unis · 48%</span></figcaption></figure>
+          <figure class="pie-fig"><div class="pie pie4" role="img" aria-label="12% undergraduate, 15% taught postgraduate, 55% PhD, 18% postdocs and staff"></div>
+            <figcaption><b>Who they were</b><span class="key"><i class="k3"></i>UG · 12%</span><span class="key"><i class="k2"></i>PGT · 15%</span><span class="key"><i class="k1"></i>PhD · 55%</span><span class="key"><i class="k4"></i>Postdocs &amp; staff · 18%</span></figcaption></figure>
+        </div>
+      </div>
+      <div class="card">
+        <span class="kicker">Data &amp; confidentiality</span>
+        <h3>No sensitive data required</h3>
+        <p>Setting a challenge never needs live clinical, patient or confidential data. Typical sources:</p>
+        <ul class="src-list">
+          <li><b>Public repositories</b><span>ClinicalTrials.gov, UniProt, GEO, TCGA, PDB, Ensembl</span></li>
+          <li><b>Non-confidential subsets</b><span>From industry R&amp;D or open-access labs</span></li>
+          <li><b>Synthetic or anonymised data</b><span>Prepared before the event</span></li>
+          <li><b>No data at all</b><span>Workflow, API testing or non-coding problems</span></li>
+        </ul>
+        <p>Participants keep ownership of their code; challenge providers get non-exclusive access to all prototype repositories, documentation and methods.</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:18px;margin-bottom:16px">Sponsorship tiers</h3>
+    <div class="tier-wrap">
+      <table class="tier-table">
+        <thead>
+          <tr><th scope="col"></th>
+            <th scope="col" class="gold"><span class="tier-name">Gold</span><span class="price">£3,000</span></th>
+            <th scope="col"><span class="tier-name">Silver</span><span class="price">£1,500</span></th>
+            <th scope="col"><span class="tier-name">Bronze</span><span class="price">£500</span></th>
+            <th scope="col"><span class="tier-name">Challenge <span class="nb">Provider</span></span><span class="price small">Free · prizes only</span></th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Opt-in CVs and email contacts for all 100+ participants</th><td class="gold">✓</td><td></td><td></td><td></td></tr>
+          <tr><th scope="row">Workshop or technical session (up to 1 hour)</th><td class="gold">✓</td><td>✓</td><td></td><td></td></tr>
+          <tr><th scope="row">Exhibition space all weekend</th><td class="gold">✓</td><td>✓</td><td>✓</td><td></td></tr>
+          <tr><th scope="row">Talk at opening or closing ceremony (up to 15 min)</th><td class="gold">✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+          <tr><th scope="row">Send your own judging panel</th><td class="gold">✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+          <tr><th scope="row">Prominent logo on website, T-shirts, banners, slides and social</th><td class="gold">✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+          <tr><th scope="row">Thanks at ceremonies and a featured social post</th><td class="gold">✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+          <tr><th scope="row">Access to all submissions and prototypes from your track</th><td class="gold">✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+          <tr><th scope="row">Opening (Fri) and closing (Sun) ceremonies</th><td class="gold">✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Any sponsor can set a challenge, or sponsor without one; tell us your preference. In-kind support (catering, compute credits, software licences, merchandise) is also welcome.</p>
+
+    <div class="multi" style="margin-top:28px">
+      <div><h3>Commit to two years</h3><p>Two-year partners get 10% off year two and are credited as Anchor Partners in all event materials.</p></div>
+      <div class="big">10%<small>off year two</small></div>
+    </div>
+    <div class="sp-cta">
+      <a class="btn primary btn-sm" href="mailto:biohackathon@ed.ac.uk?subject=Sponsoring%20Edinburgh%20BioHackathon%202027">Get in touch →</a>
+      <span class="sp-mail">Interested in sponsoring? Email <b>biohackathon@ed.ac.uk</b></span>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="faq">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">FAQ</span><h2>For sponsors &amp; challenge partners</h2></div>
+    <div class="faq-one"><div>
+        <details><summary>What does it take to host a challenge?</summary><div class="ans"><p>Propose a real, <b>non-confidential</b> biological, computational or data problem (workflows, datasets, pipelines, conceptual challenges). Teams prototype solutions, analyses or tools over the weekend. See the <a href="#sponsor">sponsorship tiers</a> for details.</p></div></details>
+        <details><summary>What is expected from challenge providers?</summary><div class="ans"><p>Define the problem statement, context and success criteria. Production-ready software is not expected. You can support teams by:</p><ul><li>Sharing docs, tutorials or example repos (e.g. in intro slides)</li><li>An optional workshop or Q&amp;A (up to 1 hour)</li><li>Answering questions and giving domain guidance during the event</li></ul><p>No continuous engineering support or debugging of team environments is expected. The organisers run best-effort pre-event sanity checks.</p></div></details>
+        <details><summary>What compute is available?</summary><div class="ans"><p>The University of Edinburgh provides access to the Eddie HPC cluster (including GPUs), onboarding on compute resources, and OpenAI API access for LLM-enabled challenges.</p></div></details>
+        <details><summary>What presence is expected?</summary><div class="ans"><ul><li>Opening ceremony, Friday afternoon, to introduce your challenge</li><li>Judging, awards and closing, Sunday afternoon</li><li>Optional Saturday Q&amp;As and mentoring</li></ul></div></details>
+        <details><summary>What do sponsors get?</summary><div class="ans"><ul><li>A sponsor stall and structured networking with participants</li><li>Visibility across event materials</li><li>A 5–10 minute challenge introduction at the opening ceremony</li><li>The option to host a 1-hour workshop or technical session</li></ul></div></details>
+        <details><summary>Can sponsors deliver technical training?</summary><div class="ans"><p>Yes, e.g. Snakemake. Either in the pre-hackathon workshop series or on Day 1, alongside academic-led sessions such as Git and Python.</p></div></details>
+        <details><summary>Do sponsors need to provide prizes?</summary><div class="ans"><p>Challenge partners are asked to contribute prizes for their track's winning team (typically 4–6 people): merchandise or digital products, internships, shadowing, fast-track interviews, or other relevant incentives.</p></div></details>
+        <details><summary>Are sponsors expected to contribute financially?</summary><div class="ans"><p>Challenge Providers contribute prizes only; Bronze, Silver and Gold are paid tiers (see above). Covering your own staff's travel is expected.</p></div></details>
+        <details><summary>Is it suitable for recruitment?</summary><div class="ans"><p>Yes. The event showcases technical ability, problem-solving, teamwork and communication. Bring both technical staff and talent representatives.</p></div></details>
+        <details><summary>When and where is the 2027 event?</summary><div class="ans"><p>Spring / early summer 2027 at the University of Edinburgh. Exact dates are to be confirmed; sponsors are confirmed in early 2027.</p></div></details>
+        <details><summary>How many participants will there be?</summary><div class="ans"><p>We had 100+ participants in 2026. For 2027 we are aiming for 200–300.</p></div></details>
+        <details><summary>Can we sponsor without setting a challenge?</summary><div class="ans"><p>Yes. Any tier can set a challenge or opt out; just tell us your preference.</p></div></details>
+        <details><summary>Who owns the code and IP?</summary><div class="ans"><p>Participants keep ownership of the code they write. Challenge providers get non-exclusive access to all prototype repositories, documentation and methods from their track.</p></div></details>
+        <details><summary>Do we need to share confidential data?</summary><div class="ans"><p>No. All challenges are non-confidential. Public, synthetic or anonymised data works, or no data at all.</p></div></details>
+        <details><summary>Can we give in-kind support instead of cash?</summary><div class="ans"><p>Yes: catering, compute credits, software licences or merchandise.</p></div></details>
+        <details><summary>Is there a multi-year option?</summary><div class="ans"><p>Yes. Commit to two years for 10% off year two and credit as an Anchor Partner.</p></div></details>
+        <details><summary>Do we get access to participant CVs?</summary><div class="ans"><p>Gold sponsors receive opt-in CVs and email contacts for all participants.</p></div></details>
+      </div></div>
+  </div>
+</section>
+
+<section class="sec band" id="contact">
+  <div class="wrap contact">
+    <div>
+      <span class="eyebrow">Get in touch</span>
+      <h2 style="margin-top:12px">Let's talk about 2027</h2>
+      <p class="lede" style="margin-top:14px">Sponsorship, challenges, mentoring or volunteering. The 2027 event runs in spring / early summer at the University of Edinburgh, with sponsors confirmed in early 2027.</p>
+      <p style="margin-top:14px;font-size:15px"><b>Ian Yang &amp; Apple Chew</b> <span style="color:var(--muted)">· Directors</span></p>
+      <div class="email"><a class="btn primary" href="mailto:biohackathon@ed.ac.uk?subject=Edinburgh%20BioHackathon%202027">Send us an email →</a><a class="btn vol" href="mailto:biohackathon@ed.ac.uk?subject=Volunteering%20for%20Edinburgh%20BioHackathon%202027">Volunteer to help</a><code id="email">biohackathon@ed.ac.uk</code><button class="copy" id="copyBtn" type="button">Copy</button></div>
+    </div>
+    <div class="links">
+      <a class="soon" aria-disabled="true">Submit a 2027 challenge <span>Form opening soon</span></a>
+      <a class="soon" aria-disabled="true">Register interest for 2027 <span>Form opening soon</span></a>
+      <a href="https://youtu.be/0IslmyI-aN4" target="_blank" rel="noopener">2026 film <span>YouTube ↗</span></a>
+      <a href="https://biohackathon-edinburgh-2026.devpost.com/project-gallery" target="_blank" rel="noopener">2026 project gallery <span>DevPost ↗</span></a>
+      <a href="https://discord.gg/RQPh2UdQVV" target="_blank" rel="noopener">Community <span>Discord ↗</span></a>
+      <a href="https://www.linkedin.com/company/biohackathon-edinburgh/" target="_blank" rel="noopener">LinkedIn <span>BioHackathon Edinburgh ↗</span></a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<main id="impact-page" data-view="impact-page" hidden>
+<section class="sec" id="impact-detail">
+  <div class="wrap">
+    <p class="caption" style="margin:0 0 18px"><a href="#impact">← Back to home</a></p>
+    <div class="sec-head">
+      <span class="eyebrow">Our impact · 2026 edition</span>
+      <h2>What one weekend created</h2>
+      <p class="lede">The full picture of Scotland's first student-led biohackathon: who took part, what they built, and what people said about it.</p>
+    </div>
+    <div class="stat-group g0"><span class="stat-h">Who came</span><div class="stats"><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/></svg><div class="n">350</div><div class="l">Applications</div><div class="d">from across the UK</div></div><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9.5" r="2.4"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M15 14.2c2.9-.4 5.5 1.4 5.8 4.8"/></svg><div class="n">100+</div><div class="l">Participants</div><div class="d">selected on merit</div></div><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 4l9 5.5-9 5.5z"/><path d="M7 12v4.5c3 2 7 2 10 0V12"/></svg><div class="n">14</div><div class="l">UK universities</div><div class="d">represented in the cohort</div></div><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16.5 9.5"/></svg><div class="n">&gt;95%</div><div class="l">Attendance</div><div class="d">stayed the full weekend</div></div></div></div>
+    <div class="stat-group g1"><span class="stat-h">What we built it with</span><div class="stats"><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></svg><div class="n">7</div><div class="l">Challenges</div><div class="d">from labs and industry</div></div><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12l4-4 4 3 3-3 3 1 4 4-5 5-3-2-2 2-3-1z"/><path d="M11 11l3 3"/></svg><div class="n">15</div><div class="l">Sponsors &amp; partners</div><div class="d">funding, compute, prizes</div></div><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg><div class="n">15</div><div class="l">Judges &amp; mentors</div><div class="d">gave up their weekend</div></div><div class="stat"><svg class="stat-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4M7 9l2 2-2 2M11 13h5"/></svg><div class="n">3</div><div class="l">Workshops</div><div class="d">Git, HPC and IP training</div></div></div></div>
+
+    <div class="g2" style="margin-top:48px;align-items:center">
+      <div class="pies">
+        <figure class="pie-fig"><div class="pie" style="--p:52" role="img" aria-label="52% University of Edinburgh, 48% other UK universities"><span>52%</span></div>
+          <figcaption><b>Where they came from</b><span class="key"><i class="k1"></i>University of Edinburgh · 52%</span><span class="key"><i class="k2"></i>Other UK universities · 48%</span></figcaption></figure>
+        <figure class="pie-fig"><div class="pie pie4" role="img" aria-label="12% undergraduate, 15% taught postgraduate, 55% PhD, 18% postdocs and staff"><span>82%</span></div>
+          <figcaption><b>Who they were</b><span class="key"><i class="k3"></i>Undergraduate (UG) · 12%</span><span class="key"><i class="k2"></i>Taught postgraduate (PGT) · 15%</span><span class="key"><i class="k1"></i>PhD (PGR) · 55%</span><span class="key"><i class="k4"></i>Postdocs &amp; staff · 18%</span></figcaption></figure>
+      </div>
+      <div class="disc">
+        <b class="disc-h">Disciplines in the room</b>
+        <div class="disc-grid"><div class="disc-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="13.5" cy="10.5" r="3"/><circle cx="8" cy="15" r="1"/></svg><span>Biology, medicine &amp; life sciences</span></div><div class="disc-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3c0 4.5 8 4.5 8 9s-8 4.5-8 9M16 3c0 4.5-8 4.5-8 9s8 4.5 8 9M9.5 7.5h5M9.5 16.5h5"/></svg><span>Bioinformatics</span></div><div class="disc-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 6l-3 12"/></svg><span>Computer science &amp; AI</span></div><div class="disc-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" transform="rotate(120 12 12)"/></svg><span>Physics &amp; maths</span></div><div class="disc-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6L4.6 18.8A1.5 1.5 0 0 0 5.9 21h12.2a1.5 1.5 0 0 0 1.3-2.2L14 9V3M7 15h10"/></svg><span>Chemistry</span></div><div class="disc-tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M5 16l5-5 4 3 6-7M15 7h5v5"/></svg><span>Business</span></div></div>
+        <div class="bg-row" aria-label="Backgrounds"><span>Wet-lab</span><span>Dry-lab</span><span>Computational</span><span>Non-coding</span></div>
+        <p class="disc-note">For many, it was their first hackathon.</p>
+      </div>
+    </div>
+
+    <div class="wins" style="margin-top:56px">
+      <div class="wins-head"><div><span class="eyebrow">Winning projects</span><h3 class="wins-title">Eight winning projects, 20 submissions</h3></div></div>
+      <div class="win-track" id="wtrack" tabindex="0">
+        <article class="win-card"><div class="win-top photo"><img src="img/filament.jpg" alt="Filament Fillies presenting their tool" loading="lazy"></div>
+          <div class="win-body"><span class="kicker">Academic track winner</span><h3>Filament Fillies</h3><p>A web tool that segments, classifies and visualises protein filaments in time-lapse yeast microscopy. Built and deployed within the 48 hours.</p><div class="win-links"><a href="https://devpost.com/software/filament-fillies" target="_blank" rel="noopener">DevPost ↗</a></div></div></article>
+        <article class="win-card"><div class="win-top"><svg class="win-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg><span class="win-chal">Bio-innovation hub resource allocation</span></div>
+          <div class="win-body"><span class="kicker">OFI challenge winner</span><h3>DEAP Crash</h3><p>Decision support for biomedical funding committees. Keeps sourced facts, assumptions and model outputs separate, runs budget scenarios and writes committee-ready briefs.</p><div class="win-links"><a href="https://devpost.com/software/deap-crash" target="_blank" rel="noopener">DevPost ↗</a></div></div></article>
+        <article class="win-card"><div class="win-top"><svg class="win-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg><span class="win-chal">Synthetic biology &amp; astrobiology</span></div>
+          <div class="win-body"><span class="kicker">Aphelion Industries challenge winner</span><h3>Growing Magnets</h3><p>Growing rare-earth-free magnets from common iron using DNA and proteins in microgravity, with sound to control the timing of growth.</p><div class="win-links"><a href="https://devpost.com/software/growing-magnets" target="_blank" rel="noopener">DevPost ↗</a></div></div></article>
+        <article class="win-card"><div class="win-top"><svg class="win-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg><span class="win-chal">Biological data analysis</span></div>
+          <div class="win-body"><span class="kicker">Pacifico Biolabs challenge winner</span><h3>GEMtimize</h3><p>An interactive app that turns a protein FASTA file into a genome-scale metabolic model, visualises the network and optimises biomass production.</p><div class="win-links"><a href="https://devpost.com/software/gemtimize" target="_blank" rel="noopener">DevPost ↗</a></div></div></article>
+        <article class="win-card"><div class="win-top"><svg class="win-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg><span class="win-chal">Sustainable beverages</span></div>
+          <div class="win-body"><span class="kicker">Quas Drinks challenge winner</span><h3>The Sugar Spinner</h3><p>A hybrid of reaction kinetics and agent-based simulation that predicts how levan polymers grow, as a step towards controlling their production.</p><div class="win-links"><a href="https://devpost.com/software/the-sugar-spinner" target="_blank" rel="noopener">DevPost ↗</a></div></div></article>
+        <article class="win-card"><div class="win-top"><svg class="win-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg><span class="win-chal">Hackathons UK</span></div>
+          <div class="win-body"><span class="kicker">Best Use of AI Agents on Arm</span><h3>Wave~Breakers</h3><p>A drug-screening service that grows tumour cells into 3D spheroids in microgravity, giving a truer picture of drug response than flat 2D cultures.</p><div class="win-links"><a href="https://devpost.com/software/wave-breakers" target="_blank" rel="noopener">DevPost ↗</a></div></div></article>
+        <article class="win-card"><div class="win-top"><svg class="win-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg><span class="win-chal">Hackathons UK</span></div>
+          <div class="win-body"><span class="kicker">Hackiest Hack</span><h3>Cween</h3><p>Upload a fungal proteome and get predicted growth, titre and yield in the browser, via flux balance analysis built for non-specialists.</p><div class="win-links"><a href="https://devpost.com/software/cween" target="_blank" rel="noopener">DevPost ↗</a></div></div></article>
+        <article class="win-card"><div class="win-top"><svg class="win-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg><span class="win-chal">Secondary challenge</span></div>
+          <div class="win-body"><span class="kicker">Best Business Idea in Bio &amp; Biotech</span><h3>Phoenix</h3><p>A Python tool that tunes growth-media composition with genome-scale metabolic models, cutting the cost and time of media optimisation.</p><div class="win-links"><a href="https://devpost.com/software/phoenix-derz79" target="_blank" rel="noopener">DevPost ↗</a></div></div></article>
+      </div>
+      <p class="caption"><a href="https://biohackathon-edinburgh-2026.devpost.com/project-gallery" target="_blank" rel="noopener">See all 20 submissions on DevPost ↗</a></p>
+    </div>
+
+
+    <div class="g3 legacy" style="margin-top:24px">
+      <div class="card"><span class="kicker">Reach</span><h3>115+ reactions in 24 hours</h3><p>The recap post drew 115+ LinkedIn reactions, 14 comments and 26 reposts within a day of the closing ceremony.</p></div>
+      <div class="card"><span class="kicker">Momentum</span><h3>Partners coming back</h3><p>Returning sponsors, challenge providers and participants have already expressed interest in 2027.</p></div>
+      <div class="card"><span class="kicker">Community</span><h3>Participants become organisers</h3><p>Several 2026 participants have asked to volunteer and help run future editions.</p></div>
+    </div>
+
+    <div class="gallery" style="margin-top:24px">
+      <figure class="tall"><img src="img/organisers.jpg" alt="Organisers Ian and Saurav beside the event banner"><figcaption>Organisers</figcaption></figure>
+      <figure><img src="img/hacking.jpg" alt="Team working at a table"><figcaption>Hacking</figcaption></figure>
+      <figure><img src="img/judging.jpg" alt="Team presenting to judges"><figcaption>Judging</figcaption></figure>
+      <figure class="tall"><img src="img/lab2.jpg" alt="Participants on a lab visit looking at equipment"><figcaption>Lab visit</figcaption></figure>
+      <figure><img src="img/breakfast.jpg" alt="Breakfast in the Nucleus"><figcaption>Breakfast</figcaption></figure>
+      <figure><img src="img/quas.jpg" alt="Quas Drinks challenge provider with the organising committee"><figcaption>Quas Drinks &amp; committee</figcaption></figure>
+    </div>
+
+    <div style="margin-top:56px">
+      <span class="eyebrow">What people said</span>
+      <div class="quotes" style="margin-top:18px">
+        <blockquote><p>Most have never participated in a hackathon before, and most have enjoyed working intensively in an interdisciplinary team over the 48h.</p><cite><b>Anton</b>Challenge Provider, Quas Drinks</cite></blockquote>
+        <blockquote><p>Given the 48h window, the outcomes were downright impressive.</p><cite><b>Lysimachos</b>Judge; Entrepreneur-in-Residence &amp; Venture Builder</cite></blockquote>
+        <blockquote><p>Congratulations on making history, I'm so grateful to have been a part of it!</p><cite><b>Elijah</b>Participant; MSc Bioinformatics, University of Edinburgh</cite></blockquote>
+        <blockquote><p>The creativity and talent on show was truly impressive.</p><cite><b>Washington</b>Challenge Provider, Pacifico Biolabs</cite></blockquote>
+        <blockquote><p>Huge credit to all the participants for stepping outside their comfort zones and building something new so quickly.</p><cite><b>Mishal</b>Mentor &amp; Judge, Koda Konsult</cite></blockquote>
+        <blockquote><p>A great mix of collaboration, learning, and innovation.</p><cite><b>Oliwia</b>Participant; PhD, MRC PPU &amp; CRUK SI</cite></blockquote>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<main id="edition-2026" data-view="edition-2026" hidden>
+<section class="sec band" id="top-2026">
+  <div class="wrap">
+    <p class="caption" style="margin:0 0 18px"><a href="#home">← Back to home</a></p>
+    <div class="ed-head">
+      <img class="ed-mark" src="img/brand/mark-blue.png" alt="">
+      <div><span class="eyebrow">Edinburgh BioHackathon</span><h1 class="ed-title">The 2026 edition</h1></div>
+    </div>
+    <div class="hero-meta" style="margin-bottom:0">
+      <p class="tag">Everything from Scotland's first student-led biohackathon: the challenges, programme, rules, team and partners.</p>
+      <div class="facts">
+        <div><b>20–22 March 2026</b> · University of Edinburgh</div>
+        <div>Fri · Edinburgh Futures Institute, Room 2.35</div>
+        <div>Sat–Sun · The Nucleus Building, King's Buildings</div>
+        <div><a href="https://biohackathon-edinburgh-2026.devpost.com/project-gallery" target="_blank" rel="noopener">Project gallery on DevPost ↗</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="tracks">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Three ways in. No coding required.</span>
+      <h2>Challenge tracks</h2>
+      <p class="lede">Each track brings together people from life sciences, computing and related fields. Teams compete in a final pitch session, and a judging panel picks the winners.</p>
+    </div>
+    <div class="trk-row"><div class="trk"><span class="trk-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6L4.6 18.8A1.5 1.5 0 0 0 5.9 21h12.2a1.5 1.5 0 0 0 1.3-2.2L14 9V3M7 15h10"/></svg></span><span class="kicker">Academic Research</span><h3>Open research problems from labs</h3><p>Modelling gene regulation, analysing imaging data, drug discovery and design, or machine learning on biological datasets. Sample datasets, academic mentors, and a route to follow-up collaborations.</p></div><div class="trk"><span class="trk-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 9h5a1 1 0 0 1 1 1v11M3 21h18M7.5 8h3M7.5 12h3M7.5 16h3M16.5 13h1M16.5 17h1"/></svg></span><span class="kicker">Industry Innovation</span><h3>Problem statements from companies</h3><p>Practical, outcome-focused challenges from biotech, health and data companies, aimed at prototypes, pipelines or analytical insights. Direct exposure to industrial R&amp;D and potential recruitment.</p></div><div class="trk"><span class="trk-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H9l-3.5 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M16 9h4a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-1v3l-3.5-3H11a1 1 0 0 1-1-1v-1"/></svg></span><span class="kicker">Non-Coder Problem-Solving</span><h3>Design, strategy and storytelling</h3><p>Experimental frameworks, conceptual solutions and project management for interdisciplinary challenges, through team exercises, scientific storytelling and design thinking.</p></div></div>
+
+    <h3 style="font-size:18px;margin:52px 0 12px">The 2026 challenges</h3>
+    <div class="chal">
+      <div class="chal-row"><b>Aphelion Industries</b><span>Synthetic biology, biotech applications and astrobiology</span><em class="pill t-ind">Industry</em></div>
+      <div class="chal-row"><b>Pacifico Biolabs</b><span>Biological data analysis</span><em class="pill t-ind">Industry</em></div>
+      <div class="chal-row"><b>Oxbridge Frontier Intelligence</b><span>AI and machine learning applied to biological problems</span><em class="pill t-ind">Industry</em></div>
+      <div class="chal-row"><b>Quas Drinks</b><span>Biotechnology for sustainable beverages, open to non-coders</span><em class="pill t-nc">Non-coding</em></div>
+      <div class="chal-row"><b>Swain Lab, University of Edinburgh</b><span>Computer vision for microscopy image analysis</span><em class="pill t-ac">Academic</em></div>
+      <div class="chal-row"><b>Hackathons UK (×2)</b><span>Open and bonus challenges</span><em class="pill t-op">Open</em></div>
+      <div class="chal-row"><b>Best Business Idea in Bio</b><span>Entrepreneurship challenge judged by a VC and industry panel</span><em class="pill t-en">Enterprise</em></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" id="programme">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Programme</span>
+      <h2>Before, during, after</h2>
+    </div>
+    <div class="phases">
+      <div class="phase"><div class="dot"></div><div class="when">Closed 13 Feb 2026</div><h3>Application</h3><p>Apply as an individual or a team. Outcomes by 20 Feb; confirm attendance by 27 Feb.</p></div>
+      <div class="phase"><div class="dot"></div><div class="when">4–18 Mar 2026</div><h3>Pre-hackathon workshops</h3><p>Technical, entrepreneurial and communication workshops co-delivered with partners.</p></div>
+      <div class="phase"><div class="dot"></div><div class="when">20–22 Mar 2026</div><h3>BioHackathon</h3><p>Opening ceremony, challenge introductions, team sprints and final pitches with prizes.</p></div>
+      <div class="phase"><div class="dot"></div><div class="when">22 Mar – late Apr 2026</div><h3>Post-hackathon</h3><p>Follow-up workshops to refine ideas, explore entrepreneurial pathways and grow projects into long-term outcomes.</p></div>
+    </div>
+
+    <h3 style="font-size:18px;margin:60px 0 18px">Pre-hackathon workshops</h3>
+    <div class="g3">
+      <div class="card ws"><span class="date">4 March</span><span class="mode">Wed · 15:30–16:30 · Online</span><h3>Intellectual property</h3><p>Lysimachos Zografos, Edinburgh Innovations</p></div>
+      <div class="card ws"><span class="date">17 March</span><span class="mode">Tue · 14:00–17:00 · Hybrid, Murchison LG.15</span><h3>Git &amp; GitHub</h3><p>Dr Alasdair Ivens, Director of Bioinformatics, CIIE</p></div>
+      <div class="card ws"><span class="date">18 March</span><span class="mode">Wed · 14:00–17:00 · Hybrid, Murchison LG.15</span><h3>How to use Eddie (HPC)</h3><p>Mike Wallis, Digital Research Services</p></div>
+    </div>
+
+    <h3 style="font-size:18px;margin:60px 0 18px">Weekend schedule</h3>
+    <div class="sched-wrap">
+      <div class="sched">
+        <div class="day">
+          <div class="day-h"><span class="d">20</span><span class="w">Fri<br>March</span><span class="v">Edinburgh Futures Institute, Room 2.35</span></div>
+          <div class="slot"><time>13:00</time><span>Registration &amp; welcome, light snacks</span></div>
+          <div class="slot key"><time>14:00</time><span>Opening ceremony &amp; challenge introductions</span></div>
+          <div class="slot"><time>15:30</time><span>Networking for final team formation</span></div>
+          <div class="slot"><time>16:00</time><span>Q&amp;A with challenge providers &amp; sponsors</span></div>
+          <div class="slot key"><time>17:00</time><span>Team formation deadline · hacking starts</span></div>
+          <div class="slot"><time>18:30</time><span>Dinner</span></div>
+          <div class="slot"><time>21:00</time><span>Building closes</span></div>
+        </div>
+        <div class="day">
+          <div class="day-h"><span class="d">21</span><span class="w">Sat<br>March</span><span class="v">The Nucleus Building</span></div>
+          <div class="slot"><time>08:00</time><span>Breakfast</span></div>
+          <div class="slot"><time>10:00</time><span>Optional mentor workshop / mental health break</span></div>
+          <div class="slot"><time>12:00</time><span>Lunch</span></div>
+          <div class="slot"><time>15:00</time><span>Mental health break (guided walk)</span></div>
+          <div class="slot"><time>18:00</time><span>Dinner</span></div>
+          <div class="slot"><time>20:30</time><span>Mental health break, board games</span></div>
+          <div class="slot"><time>23:00</time><span>End of day</span></div>
+        </div>
+        <div class="day">
+          <div class="day-h"><span class="d">22</span><span class="w">Sun<br>March</span><span class="v">The Nucleus Building</span></div>
+          <div class="slot"><time>08:00</time><span>Breakfast</span></div>
+          <div class="slot"><time>10:30</time><span>Mental health break</span></div>
+          <div class="slot key"><time>12:00</time><span>Submission deadline · lunch</span></div>
+          <div class="slot key"><time>13:00</time><span>Pitching &amp; judging (to 15:00)</span></div>
+          <div class="slot"><time>15:00</time><span>Judges deliberate</span></div>
+          <div class="slot key"><time>15:30</time><span>Closing &amp; awards ceremony</span></div>
+          <div class="slot"><time>17:00</time><span>End</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="caption"><span class="swipe-hint">Swipe the schedule sideways to see Saturday and Sunday. </span>Mentors check in with teams throughout Saturday. Coffee, tea and snacks all day.</p>
+  </div>
+</section>
+
+<section class="sec" id="guide">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Participant guide</span>
+      <h2>How it works</h2>
+      <p class="lede">The rules and essentials from the 2026 participant info pack.</p>
+    </div>
+    <div class="guide">
+      <div class="card"><div class="g-head"><span class="g-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9.5" r="2.4"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M15 14.2c2.9-.4 5.5 1.4 5.8 4.8"/></svg></span><h3>Who can take part</h3></div><ul>
+        <li>UG, PGT and PGR students, postdocs, academic staff, and recent graduates (within the past year) from UK universities</li>
+        <li>18 or older</li>
+        <li>Registered and present in person for the weekend</li>
+        <li>Official volunteers can't compete as hackers</li></ul></div>
+      <div class="card"><div class="g-head"><span class="g-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="6" r="2.5"/><circle cx="5.5" cy="12" r="2.2"/><circle cx="18.5" cy="12" r="2.2"/><circle cx="12" cy="18" r="2.5"/><path d="M10 7.5 7 10.5M14 7.5l3 3M7 13.5l3 3M17 13.5l-3 3"/></svg></span><h3>Teams of 4–6</h3></div><p>Form your own team, or join one on Discord and at the Friday networking session. Final teams are set by the end of Day 1. Suggested mix:</p>
+        <div class="roles"><div>Domain expert</div><div>AI engineer</div><div>Bioinformatics / data</div><div>Business / product / design</div></div></div>
+      <div class="card"><div class="g-head"><span class="g-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="11" rx="1.5"/><path d="M1.5 19h21"/></svg></span><h3>What to bring</h3></div><ul><li>Laptop and charger</li><li>Notebook and pen</li><li>Any software we tell you to install</li></ul>
+        <h3 style="margin-top:8px">We provide</h3><ul><li>Meals and refreshments, workspace</li><li>Mentors, facilitators and mental health breaks</li><li>Heat-and-eat stations, water points, baby feeding room; showers on request</li></ul></div>
+      <div class="card"><div class="g-head"><span class="g-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 6l-3 12"/></svg></span><h3>Code rules</h3></div><ul>
+        <li>Core work happens during the event; no substantial pre-written project code</li>
+        <li>Public frameworks, libraries and tools are fine</li>
+        <li>AI tools (ChatGPT, Copilot, LLM APIs) allowed if disclosed and credited</li>
+        <li>Thin wrappers around existing tools may be disqualified</li></ul></div>
+      <div class="card"><div class="g-head"><span class="g-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5"/><path d="M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></svg></span><h3>Submission · Sun 12:00</h3></div><ul>
+        <li>GitHub repository and a clear README (for coding projects)</li>
+        <li>List of frameworks, datasets and AI tools used</li>
+        <li>Pitch deck</li>
+        <li>Submitted on DevPost; late entries may not be judged</li></ul></div>
+      <div class="card"><div class="g-head"><span class="g-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg></span><h3>Judging</h3></div><p>In person on Sunday: live demo, short pitch, judges' Q&amp;A. Criteria vary by track and typically include:</p>
+        <div class="criteria"><span>Technical quality</span><span>Solution &amp; value proposition</span><span>Creativity</span><span>Relevance to challenge</span><span>Feasibility</span><span>Presentation</span><span>Team momentum</span><span>Bonus: extra mile</span></div></div>
+      <div class="card"><div class="g-head"><span class="g-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span><h3>Intellectual property</h3></div><ul>
+        <li>Low-risk, exploratory event; you keep ownership of your ideas</li>
+        <li>No obligation to form a company</li>
+        <li>Organisers may share non-confidential summaries and images</li>
+        <li>Don't disclose confidential data, including your own PhD or postdoc research</li></ul></div>
+      <div class="card"><div class="g-head"><span class="g-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 8.5c0 5.5-8.5 11-8.5 11s-8.5-5.5-8.5-11A4.5 4.5 0 0 1 12 6a4.5 4.5 0 0 1 8.5 2.5z"/></svg></span><h3>Code of conduct</h3></div><ul>
+        <li>Be kind, collaborative and respectful of every background and skill level</li>
+        <li>No harassment or discrimination; follow venue safety rules</li>
+        <li>Credit all external code, data, models and tools</li></ul>
+        <p><a href="https://www.hackathons.org.uk/code-of-conduct/" target="_blank" rel="noopener">Full code of conduct ↗</a></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" id="partners">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Sponsors &amp; partners</span>
+      <h2>Who made 2026 possible</h2>
+    </div>
+    <div class="partners">
+      <a class="partner" href="https://aibio.ac.uk/about/" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/aibio.png" alt="AIBIO-UK logo" loading="lazy"></span><b>AIBIO-UK</b><span>Sponsor</span></a>
+      <a class="partner" href="https://www.ailurus.bio/about" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/ailurus.png" alt="Ailurus logo" loading="lazy"></span><b>Ailurus</b><span>Sponsor</span></a>
+      <a class="partner" href="https://www.amytis.io/" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/amytis.png" alt="Amytis logo" loading="lazy"></span><b>Amytis</b><span>Digital workspace</span></a>
+      <a class="partner" href="https://www.aphelionspace.org/" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/aphln.png" alt="Aphelion Industries logo" loading="lazy"></span><b>Aphelion Industries</b><span>Challenge</span></a>
+      <a class="partner" href="https://www.chai.ac.uk/" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/chai.png" alt="CHAI Hub logo" loading="lazy"></span><b>CHAI Hub</b><span>Sponsor</span></a>
+      <a class="partner" href="https://digitalresearchservices.ed.ac.uk/" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/drs.png" alt="Digital Research Services logo" loading="lazy"></span><b>Digital Research Services</b><span>GPU compute · Workshop</span></a>
+      <a class="partner" href="https://edinburgh-innovations.ed.ac.uk/" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/ei.png" alt="Edinburgh Innovations logo" loading="lazy"></span><b>Edinburgh Innovations</b><span>IP workshop · Mentoring</span></a>
+      <a class="partner" href="https://www.hackathons.org.uk/" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/huk.svg" alt="Hackathons UK logo" loading="lazy"></span><b>Hackathons UK</b><span>Partner · Challenge</span></a>
+      <a class="partner" href="https://www.openbiosim.org/" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/openbiosim.svg" alt="OpenBioSim logo" loading="lazy"></span><b>OpenBioSim</b><span>Sponsor · Challenge</span></a>
+      <a class="partner" href="https://www.oxbridgefrontier.com/" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/ofi.png" alt="Oxbridge Frontier Intelligence logo" loading="lazy"></span><b>Oxbridge Frontier Intelligence</b><span>Challenge</span></a>
+      <a class="partner" href="https://www.pacifico.bio/" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/pacifico.svg" alt="Pacifico Biolabs logo" loading="lazy"></span><b>Pacifico Biolabs</b><span>Challenge</span></a>
+      <a class="partner" href="https://quasdrinks.co.uk/" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/quas.png" alt="Quas Drinks logo" loading="lazy"></span><b>Quas Drinks</b><span>Challenge</span></a>
+      <a class="partner" href="https://www.ph.ed.ac.uk" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/ph.png" alt="School of Physics &amp; Astronomy logo" loading="lazy"></span><b>School of Physics &amp; Astronomy</b><span>Sponsor</span></a>
+      <a class="partner" href="https://www.ed.ac.uk/student-experience-grants" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/experience-grants.png" alt="Student Experience Grants logo" loading="lazy"></span><b>Student Experience Grants</b><span>Sponsor</span></a>
+      <a class="partner" href="https://sulsa.ac.uk/" target="_blank" rel="noopener"><span class="plate"><img src="img/logos/sulsa.png" alt="SULSA logo" loading="lazy"></span><b>SULSA</b><span>Sponsor</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="faq-2026">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">FAQ</span><h2>For participants</h2></div>
+    <div class="faq-one"><div>
+        
+        <details><summary>Do participants need coding experience?</summary><div class="ans"><p>No. Some challenges involve coding, but dedicated non-coding tracks focus on experimental design, problem-solving and communication, so everyone can contribute.</p></div></details>
+        <details><summary>How are teams formed?</summary><div class="ans"><p>Apply as an individual or as a team of 4–6. Individuals form teams on Discord and at in-person networking and team formation sessions before hacking starts.</p></div></details>
+        <details><summary>Will there be prizes or certificates?</summary><div class="ans"><p>Yes. Winning teams receive prizes, and everyone gets a certificate of participation. Follow-on opportunities include incubators, funding and collaborations.</p></div></details>
+        <details><summary>What support is available?</summary><div class="ans"><p>Pre-event workshops (technical skills, entrepreneurship, IP, Python, Git) and mentorship from academic and industry experts linked to each challenge. Travel support covers partial to full reimbursement, up to £60 per person, based on competition and need.</p></div></details>
+        <details><summary>How much time commitment is expected?</summary><div class="ans"><p>Workshops are optional; pick by skill level. The hackathon runs from Friday afternoon to Sunday afternoon, with final judging and awards on Sunday.</p></div></details>
+        <details><summary>Can projects continue after the hackathon?</summary><div class="ans"><p>Yes. Selected projects may receive continued mentorship or sponsorship support, depending on partner interest and participant initiative.</p></div></details>
+        <details><summary>Who organises the BioHackathon?</summary><div class="ans"><p>An independent, volunteer team of early-career researchers at the University of Edinburgh, led by Ian Yang (Swain Lab, School of Biological Sciences) and Apple Chew, with the Centre for Engineering Biology and partners across the University.</p></div></details>
+      </div></div>
+  </div>
+</section>
+
+</main>
+
+<main id="team-page" data-view="team-page" hidden>
+<section class="sec" id="team">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">The team</span>
+      <h2>Run by volunteers</h2>
+      <p class="lede">Edinburgh BioHackathon is run by an independent team of early-career researchers, mostly PhD students and postdocs at the University of Edinburgh.</p>
+    </div>
+    <div class="team">
+      <div class="member"><img class="av" src="img/team/ian.jpg" alt="" loading="lazy"><div><b>Ian Yang</b><span>Director</span></div></div>
+      <div class="member"><img class="av" src="img/team/apple.jpg" alt="" loading="lazy"><div><b>Apple Chew</b><span>Director</span></div></div>
+      <div class="member"><img class="av" src="img/team/javi.jpg" alt="" loading="lazy"><div><b>Javi Mazo Gonzalez-Choren</b><span>Events</span></div></div>
+      <div class="member"><img class="av" src="img/team/saurav.jpg" alt="" loading="lazy"><div><b>Saurav Sreejith</b><span>Logistics</span></div></div>
+      <div class="member"><img class="av" src="img/team/elena.jpg" alt="" loading="lazy"><div><b>Elena Hein</b><span>Design / Marketing</span></div></div>
+      <div class="member"><img class="av" src="img/team/jinxuan.jpg" alt="" loading="lazy"><div><b>Jinxuan Cui</b><span>Tech</span></div></div>
+      <div class="member"><img class="av" src="img/team/adriana.jpg" alt="" loading="lazy"><div><b>Adriana Cusi</b><span>Events</span></div></div>
+      <div class="member"><img class="av" src="img/team/horace.jpg" alt="" loading="lazy"><div><b>Horace Chan</b><span>Events</span></div></div>
+      <div class="member"><img class="av" src="img/team/zunaira.jpg" alt="" loading="lazy"><div><b>Zunaira Aman</b><span>Logistics</span></div></div>
+      <div class="member"><img class="av" src="img/team/hari.jpg" alt="" loading="lazy"><div><b>Hari Shyamapant</b><span>Logistics</span></div></div>
+      <div class="member"><img class="av" src="img/team/connor.jpg" alt="" loading="lazy"><div><b>Connor Aylesworth</b><span>Logistics</span></div></div>
+      <div class="member"><img class="av" src="img/team/davide.jpg" alt="" loading="lazy"><div><b>Davide Michieletto</b><span>Advisor</span></div></div>
+      <div class="member"><img class="av" src="img/team/tanmay.jpg" alt="" loading="lazy"><div><b>Tanmay Gupta</b><span>External Judge</span></div></div>
+    </div>
+  </div>
+</section>
+<section class="sec band" id="acknowledgements">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Acknowledgements</span>
+      <h2>With thanks to</h2>
+      <p class="lede">The 2026 edition would not have happened without the people who gave their weekend beyond the organising team.</p>
+    </div>
+    <h3 class="obj-h">Judges &amp; mentors, by challenge</h3>
+    <div class="ack"><div class="ack-col"><h4>Academic track · Swain Lab, University of Edinburgh</h4><ul><li><b>Dr Bram Prevo</b><span>Postdoctoral research associate</span></li><li><b>Dr Richard Wheeler</b><span>Chancellor’s Fellow, University of Edinburgh</span></li></ul></div><div class="ack-col"><h4>Oxbridge Frontier Intelligence</h4><ul><li><b>Dr Farah Huzair</b><span>Lecturer in Science, Technology &amp; Innovation Studies</span></li><li><b>Dr Kate Smith</b><span>Founder &amp; CEO, ProfessorMe</span></li></ul></div><div class="ack-col"><h4>Quas Drinks</h4><ul><li><b>Dr Anton Puzorjov</b><span>Founder, Quas Drinks</span></li><li><b>Dr Marcus Price</b><span>Postdoctoral research associate</span></li></ul></div><div class="ack-col"><h4>Aphelion Industries</h4><ul><li><b>James Snape</b></li><li><b>Éanna Doyle</b></li><li><b>Dr Mason Robbins</b></li></ul></div><div class="ack-col"><h4>Pacifico Biolabs</h4><ul><li><b>Washington Logrono</b></li></ul></div><div class="ack-col"><h4>Hackathons UK</h4><ul><li><b>Erin Osher</b></li></ul></div><div class="ack-col"><h4>Best Business Idea in Bio</h4><ul><li><b>Robert Gelb</b><span>Techstart Ventures</span></li><li><b>Dr Lysimachos Zografos</b><span>Edinburgh Innovations</span></li><li><b>Mishal Howard-Taylor</b><span>Koda Konsult</span></li></ul></div></div>
+    <h3 class="obj-h" style="margin-top:36px">Advisors &amp; workshop leads</h3>
+    <div class="ack"><div class="ack-col"><h4>Advisor</h4><ul><li><b>Peter Swain</b><span>School of Biological Sciences, University of Edinburgh</span></li></ul></div><div class="ack-col"><h4>Workshop leads</h4><ul><li><b>Dr Lysimachos Zografos</b><span>Intellectual property · Edinburgh Innovations</span></li><li><b>Dr Alasdair Ivens</b><span>Git &amp; GitHub · CIIE</span></li><li><b>Mike Wallis</b><span>Eddie HPC · Digital Research Services</span></li></ul></div></div>
+    <p class="ack-note">Thanks also to our <a href="#supporters">sponsors and partners</a>, the Centre for Engineering Biology, and Hack The Burgh for letting us adapt their website design for 2026.</p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="foot-brand"><img class="lt" src="img/brand/mark-blue.png" alt=""><img class="dk" src="img/brand/mark-light.png" alt=""> Edinburgh BioHackathon · University of Edinburgh</span>
+    <span>#EdinburghBioHackathon</span>
+  </div>
+</footer>
+
+<script>
+document.getElementById('copyBtn').addEventListener('click', function(){
+  var btn=this, txt=document.getElementById('email').textContent;
+  function done(){btn.textContent='Copied';setTimeout(function(){btn.textContent='Copy'},1600)}
+  function fallback(){var r=document.createRange();r.selectNodeContents(document.getElementById('email'));var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selected, press Ctrl+C'}
+  try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
+});
+
+(function(){
+  var views=[].slice.call(document.querySelectorAll('[data-view]'));
+  function route(){
+    var id=''; try{id=decodeURIComponent(location.hash.slice(1))}catch(e){}
+    var el=id?document.getElementById(id):null;
+    var v=(el&&el.closest('[data-view]'))||views[0];
+    views.forEach(function(x){x.hidden=x!==v});
+    [].forEach.call(document.querySelectorAll('[data-nav]'),function(n){n.hidden=n.getAttribute('data-nav')!==v.id});
+    if(el&&el!==v){requestAnimationFrame(function(){el.scrollIntoView()})}else{window.scrollTo(0,0)}
+  }
+  window.addEventListener('hashchange',route); route();
+})();
+(function(){
+  var t=document.getElementById('track'); if(!t) return;
+  var dots=[].slice.call(document.querySelectorAll('#dots .dot')), n=dots.length;
+  var smooth=matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
+  function cur(){return Math.round(t.scrollLeft/t.clientWidth)}
+  function go(i){i=(i+n)%n;t.scrollTo({left:i*t.clientWidth,behavior:smooth})}
+  t.addEventListener('scroll',function(){var i=cur();dots.forEach(function(d,k){d.classList.toggle('on',k===i)})},{passive:true});
+  dots.forEach(function(d,k){d.addEventListener('click',function(){go(k)})});
+  document.getElementById('cprev').addEventListener('click',function(){go(cur()-1)});
+  document.getElementById('cnext').addEventListener('click',function(){go(cur()+1)});
+  t.addEventListener('keydown',function(e){if(e.key==='ArrowRight'){e.preventDefault();go(cur()+1)}if(e.key==='ArrowLeft'){e.preventDefault();go(cur()-1)}});
+})();
+(function(){
+  var t=document.getElementById('wtrack'); if(!t) return;
+  var cards=t.querySelectorAll('.win-card'), n=cards.length, prev=document.getElementById('wprev'), next=document.getElementById('wnext'), cnt=document.getElementById('wcount');
+  if(!prev||!next||!cnt) return;
+  var smooth=matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
+  function w(){return cards[0].getBoundingClientRect().width+20}
+  function idx(){return Math.round(t.scrollLeft/w())}
+  function upd(){var i=idx(),v=Math.max(1,Math.round(t.clientWidth/w())),end=t.scrollLeft+t.clientWidth>=t.scrollWidth-4;cnt.textContent=(v>1?(i+1)+'–'+Math.min(i+v,n):(i+1))+' of '+n;prev.disabled=i<=0;next.disabled=end}
+  function go(i){t.scrollTo({left:Math.max(0,Math.min(i,n-1))*w(),behavior:smooth})}
+  prev.addEventListener('click',function(){go(idx()-1)});
+  next.addEventListener('click',function(){go(idx()+1)});
+  t.addEventListener('scroll',upd,{passive:true}); window.addEventListener('resize',upd); window.addEventListener('hashchange',function(){setTimeout(upd,50)}); upd();
+})();
+(function(){
+  var nav=document.querySelector('.nav'), b=document.getElementById('menuBtn'); if(!nav||!b) return;
+  function set(o){nav.classList.toggle('open',o);b.setAttribute('aria-expanded',o?'true':'false');b.textContent=o?'Close':'Menu'}
+  b.addEventListener('click',function(){set(!nav.classList.contains('open'))});
+  nav.addEventListener('click',function(e){if(e.target.closest('.navlinks a'))set(false)});
+  window.addEventListener('hashchange',function(){set(false)});
+})();
+</script>
+
+</body></html>
