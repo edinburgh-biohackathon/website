@@ -256,6 +256,16 @@ a.partner:hover{border-color:var(--accent)}
 .logo-strip a.plate{border:1px solid var(--line);transition:border-color .15s,transform .15s}
 .logo-strip a.plate:hover{border-color:var(--accent);transform:translateY(-2px)}
 .faq-one{max-width:760px}
+.faq-tabs{display:inline-flex;flex-wrap:wrap;gap:6px;padding:5px;border:1px solid var(--line);border-radius:12px;background:var(--surface);margin-bottom:28px;max-width:100%}
+.faq-tabs button{font:inherit;font-weight:600;font-size:15px;padding:10px 16px;border-radius:8px;border:0;background:transparent;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-align:left}
+.faq-tabs button span{font-family:var(--mono);font-size:12px;font-weight:500;padding:1px 7px;border-radius:999px;background:var(--band);color:var(--muted)}
+.faq-tabs button:hover{color:var(--ink)}
+.faq-tabs button[aria-selected="true"]{background:var(--accent);color:var(--on-accent)}
+.faq-tabs button[aria-selected="true"] span{background:rgba(255,255,255,.22);color:var(--on-accent)}
+.faq-lead{font-size:18px;margin-bottom:20px;padding-left:14px;border-left:4px solid var(--accent);max-width:56ch;color:var(--muted)}
+.faq-lead b{color:var(--ink)}
+.faq-panel details:first-of-type{border-top:1px solid var(--line)}
+
 .band .title .o{color:var(--band)}
 
 /* pies */
@@ -849,8 +859,26 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
 
 <section class="sec" id="faq">
   <div class="wrap">
-    <div class="sec-head"><span class="eyebrow">FAQ</span><h2>For sponsors &amp; challenge partners</h2></div>
-    <div class="faq-one"><div>
+    <div class="sec-head"><span class="eyebrow">FAQ</span><h2>Quick answers</h2></div>
+    <div class="faq-tabs" role="tablist" aria-label="Who is asking?">
+      <button type="button" role="tab" id="tab-faq-participants" aria-controls="faq-participants" aria-selected="true">I want to take part <span>7</span></button>
+      <button type="button" role="tab" id="tab-faq-sponsors" aria-controls="faq-sponsors" aria-selected="false" tabindex="-1">I want to sponsor or set a challenge <span>17</span></button>
+    </div>
+    <div class="faq-one faq-panel" id="faq-participants" role="tabpanel" aria-labelledby="tab-faq-participants">
+      <p class="faq-lead"><b>No coding needed.</b> Non-coding tracks, mentors on every challenge, and travel support up to £60.</p>
+      <div>
+        <details><summary>Do participants need coding experience?</summary><div class="ans"><p>No. Some challenges involve coding, but dedicated non-coding tracks focus on experimental design, problem-solving and communication, so everyone can contribute.</p></div></details>
+        <details><summary>How are teams formed?</summary><div class="ans"><p>Apply as an individual or as a team of 4–6. Individuals form teams on Discord and at in-person networking and team formation sessions before hacking starts.</p></div></details>
+        <details><summary>Will there be prizes or certificates?</summary><div class="ans"><p>Yes. Winning teams receive prizes, and everyone gets a certificate of participation. Follow-on opportunities include incubators, funding and collaborations.</p></div></details>
+        <details><summary>What support is available?</summary><div class="ans"><p>Pre-event workshops (technical skills, entrepreneurship, IP, Python, Git) and mentorship from academic and industry experts linked to each challenge. Travel support covers partial to full reimbursement, up to £60 per person, based on competition and need.</p></div></details>
+        <details><summary>How much time commitment is expected?</summary><div class="ans"><p>Workshops are optional; pick by skill level. The hackathon runs from Friday afternoon to Sunday afternoon, with final judging and awards on Sunday.</p></div></details>
+        <details><summary>Can projects continue after the hackathon?</summary><div class="ans"><p>Yes. Selected projects may receive continued mentorship or sponsorship support, depending on partner interest and participant initiative.</p></div></details>
+        <details><summary>Who organises the BioHackathon?</summary><div class="ans"><p>An independent, volunteer team of early-career researchers at the University of Edinburgh, led by Ian Yang (Swain Lab, School of Biological Sciences) and Apple Chew, with the Centre for Engineering Biology and partners across the University.</p></div></details>
+      </div>
+    </div>
+    <div class="faq-one faq-panel" id="faq-sponsors" role="tabpanel" aria-labelledby="tab-faq-sponsors">
+      <p class="faq-lead"><b>No confidential data needed.</b> Bring a real problem; participants keep their code, you get access to every prototype.</p>
+      <div>
         <details><summary>What does it take to host a challenge?</summary><div class="ans"><p>Propose a real, <b>non-confidential</b> biological, computational or data problem (workflows, datasets, pipelines, conceptual challenges). Teams prototype solutions, analyses or tools over the weekend. See the <a href="#sponsor">sponsorship tiers</a> for details.</p></div></details>
         <details><summary>What is expected from challenge providers?</summary><div class="ans"><p>Define the problem statement, context and success criteria. Production-ready software is not expected. You can support teams by:</p><ul><li>Sharing docs, tutorials or example repos (e.g. in intro slides)</li><li>An optional workshop or Q&amp;A (up to 1 hour)</li><li>Answering questions and giving domain guidance during the event</li></ul><p>No continuous engineering support or debugging of team environments is expected. The organisers run best-effort pre-event sanity checks.</p></div></details>
         <details><summary>What compute is available?</summary><div class="ans"><p>The University of Edinburgh provides access to the Eddie HPC cluster (including GPUs), onboarding on compute resources, and OpenAI API access for LLM-enabled challenges.</p></div></details>
@@ -868,7 +896,8 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
         <details><summary>Can we give in-kind support instead of cash?</summary><div class="ans"><p>Yes: catering, compute credits, software licences or merchandise.</p></div></details>
         <details><summary>Is there a multi-year option?</summary><div class="ans"><p>Yes. Commit to two years for 10% off year two and credit as an Anchor Partner.</p></div></details>
         <details><summary>Do we get access to participant CVs?</summary><div class="ans"><p>Gold sponsors receive opt-in CVs and email contacts for all participants.</p></div></details>
-      </div></div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1283,6 +1312,25 @@ document.getElementById('copyBtn').addEventListener('click', function(){
   poster.addEventListener('click',play);
   var b=document.querySelector('[data-play-film]');
   if(b) b.addEventListener('click',function(e){ play(e); poster.scrollIntoView({behavior:'smooth',block:'center'}); });
+})();
+</script>
+<script>
+(function(){
+  var tabs=[].slice.call(document.querySelectorAll('.faq-tabs [role=tab]')); if(!tabs.length) return;
+  function sel(t,focus){
+    tabs.forEach(function(x){var on=x===t; x.setAttribute('aria-selected',on); x.tabIndex=on?0:-1;
+      var p=document.getElementById(x.getAttribute('aria-controls')); if(p) p.hidden=!on;});
+    if(focus) t.focus();
+  }
+  tabs.forEach(function(t,i){
+    t.addEventListener('click',function(){sel(t)});
+    t.addEventListener('keydown',function(e){
+      var d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0; if(!d) return;
+      e.preventDefault(); sel(tabs[(i+d+tabs.length)%tabs.length],true);
+    });
+  });
+  function fromHash(){var h=location.hash.slice(1); var t=tabs.filter(function(x){return x.getAttribute('aria-controls')===h})[0]; sel(t||tabs.filter(function(x){return x.getAttribute('aria-selected')==='true'})[0]||tabs[0]);}
+  window.addEventListener('hashchange',fromHash); fromHash();
 })();
 </script>
 </body></html>
