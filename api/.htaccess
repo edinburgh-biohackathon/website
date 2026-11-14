@@ -1,0 +1,6 @@
+# All /api/* requests go to index.php. lib/ is never served.
+Options -Indexes
+RewriteEngine On
+RewriteRule ^lib(/|$) - [F,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]

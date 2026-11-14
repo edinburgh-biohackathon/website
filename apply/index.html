@@ -1,0 +1,740 @@
+<title>Applicant Sign-in</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: split screen. Left a gradient brand panel with the event facts; right the sign-in card (email, then 6-digit code), then the applicant's status page. Light only, site tokens. */
+:root{
+  color-scheme:light;
+  --bg:#FFFFFF; --band:#FAFAFA; --surface:#FFFFFF; --ink:#18181B; --muted:#4B5563; --faint:#6B7280; --line:#E5E7EB;
+  --accent:#3639FD; --accent-soft:#EEF1FF; --ok:#0B7A60; --ok-bg:#E3F5EE; --err:#B42318; --err-bg:#FDECEA; --amber:#8A5A12; --amber-bg:#FDF4E3;
+  --grad:linear-gradient(150deg,#7E4AA8 0%,#3F7F86 48%,#1E22B4 100%);
+  --display:'Bungee','Arial Black',Impact,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+a{color:var(--accent)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+
+.split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);min-height:100vh}
+.brandside{position:relative;overflow:hidden;background:var(--grad);color:#FFFFFF;padding-block:40px;padding-left:max(40px,env(safe-area-inset-left,0px));padding-right:40px;display:flex;flex-direction:column;gap:40px}
+.brandside::after{content:"";position:absolute;right:-120px;bottom:-120px;width:380px;height:380px;border-radius:50%;border:1px solid rgba(255,255,255,.18);box-shadow:0 0 0 40px rgba(255,255,255,.04),0 0 0 90px rgba(255,255,255,.03)}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:15px;color:#FFFFFF;text-decoration:none;position:relative;z-index:1}
+.brand img{width:24px;height:auto}
+.pitch{position:relative;z-index:1;margin-top:auto}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+.brandside .eyebrow{color:rgba(255,255,255,.8)}
+.pitch h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,4.6vw,54px);line-height:1;letter-spacing:.01em;margin:12px 0 16px;text-wrap:balance}
+.pitch p{font-size:16.5px;opacity:.9;max-width:42ch}
+.facts{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.22);border-radius:12px;overflow:hidden}
+.facts div{background:rgba(20,16,60,.28);padding:14px 16px}
+.facts dt{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.75}
+.facts dd{margin:2px 0 0;font-weight:600;font-size:15px}
+
+.formside{display:flex;flex-direction:column;padding-block:28px 32px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+.topbar{display:flex;justify-content:flex-end}
+.back{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:6px}
+.back:hover{background:var(--band);color:var(--ink)}
+.center{flex:1;display:grid;place-items:center;padding-block:32px}
+.card{width:100%;max-width:420px;display:grid;gap:22px}
+.card.wide{max-width:560px}
+.step{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600;letter-spacing:.08em}
+h2{font-size:28px;font-weight:600;line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
+.sub{color:var(--muted);font-size:15.5px;margin-top:6px}
+.sub b{color:var(--ink);font-weight:600;overflow-wrap:anywhere}
+.field{display:grid;gap:7px}
+.lab{font-weight:600;font-size:15px}
+input[type=email]{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:12px 14px;transition:border-color .15s,box-shadow .15s}
+input[type=email]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.invalid input[type=email]{border-color:var(--err)}
+.err{display:none;color:var(--err);font-size:13.5px}
+.invalid .err{display:block}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:600;font-size:15.5px;padding:13px 22px;border-radius:8px;border:1.5px solid var(--ink);color:var(--ink);background:transparent;cursor:pointer;text-decoration:none;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:3px 3px 0 var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+.link{background:none;border:0;padding:0;font:inherit;font-size:14.5px;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.link[disabled]{color:var(--faint);text-decoration:none;cursor:default}
+.note{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--faint);line-height:1.5}
+.note svg{flex:none;width:16px;height:16px;margin-top:2px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.preview{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;padding:6px 10px;border-radius:6px;background:var(--amber-bg);color:var(--amber);justify-self:start}
+.alert{display:none;padding:12px 14px;border-radius:8px;background:var(--err-bg);color:var(--err);font-size:14.5px}
+.alert.show{display:block}
+
+.otp{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.otp input{width:100%;aspect-ratio:5/6;max-width:100%;text-align:center;font-family:var(--mono);font-size:26px;font-weight:600;color:var(--ink);border:1.5px solid var(--line);border-radius:10px;background:var(--surface);caret-color:var(--accent);transition:border-color .15s,box-shadow .15s}
+.otp input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.otp input.filled{border-color:#B9BCF9;background:var(--accent-soft)}
+.otp.bad input{border-color:var(--err);background:var(--err-bg)}
+.row{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;justify-content:space-between;font-size:14.5px;color:var(--muted)}
+.timer{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* Applicant status */
+.who{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--band);font-size:14.5px}
+.who b{overflow-wrap:anywhere}
+.status-pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;letter-spacing:.04em;padding:4px 10px;border-radius:999px;background:var(--amber-bg);color:var(--amber);font-weight:600}
+.status-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.timeline{list-style:none;padding:0;margin:0;display:grid}
+.timeline li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:14px;position:relative;padding-bottom:22px}
+.timeline li:last-child{padding-bottom:0}
+.timeline li::before{content:"";position:absolute;left:13px;top:28px;bottom:0;width:2px;background:var(--line)}
+.timeline li:last-child::before{display:none}
+.timeline li.done::before{background:var(--ok)}
+.mk{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;font-family:var(--mono);font-size:12px;color:var(--faint);position:relative;z-index:1}
+.done .mk{background:var(--ok);border-color:var(--ok)}
+.done .mk::after{content:"";width:10px;height:5px;border-left:2px solid #FFFFFF;border-bottom:2px solid #FFFFFF;transform:rotate(-45deg) translate(1px,-1px)}
+.now .mk{border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.tl-t{font-weight:600;line-height:1.35;padding-top:2px}
+.tl-d{color:var(--muted);font-size:14.5px;margin-top:2px}
+.now .tl-t{color:var(--accent)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.toast{display:none;padding:12px 14px;border-radius:8px;background:var(--accent-soft);color:var(--ink);font-size:14.5px}
+.toast.show{display:block}
+
+.foot{font-size:13px;color:var(--faint);text-align:center}
+
+@media (max-width:860px){
+  .split{grid-template-columns:1fr;min-height:0}
+  .brandside{padding-block:24px 28px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));gap:22px}
+  .brandside::after{width:240px;height:240px;right:-90px;bottom:-110px}
+  .pitch{margin-top:0}
+  .pitch h1{font-size:32px;margin:8px 0 8px}
+  .pitch p{font-size:15px}
+  .facts{display:none}
+  .formside{padding-top:8px}
+  .topbar{display:none}
+  .center{place-items:start center;padding-block:20px}
+}
+@media (max-width:420px){.otp{gap:6px}.otp input{font-size:22px}}
+
+/* ===== Application form view ===== */
+#v-form{min-height:100vh;background:var(--bg)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:rgba(255,255,255,.94)}
+.fnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.fnav .wrap{display:flex;align-items:center;gap:14px;height:56px}
+.fnav .brand{color:var(--ink)}
+.fnav .brand img{width:22px}
+.fnav .spacer{margin-left:auto}
+.saved{font-family:var(--mono);font-size:12px;color:var(--faint);white-space:nowrap}
+.f-intro{background:var(--band);border-bottom:1px solid var(--line)}
+.f-intro .wrap{padding-block:36px 32px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:36px;align-items:start}
+.f-intro h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,4.6vw,48px);line-height:1.02;margin:10px 0 12px;text-wrap:balance}
+.f-intro .eyebrow{color:var(--accent)}
+.f-intro p.lede{color:var(--muted);font-size:16.5px;max-width:58ch}
+.before{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:16px 18px}
+.before b{display:block;margin-bottom:8px}
+.before ol{margin:0;padding-left:20px;display:grid;gap:6px;font-size:14.5px;color:var(--muted)}
+.flayout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:40px;padding-block:36px 72px}
+.rail{position:sticky;top:88px;align-self:start;display:grid;gap:4px}
+.rail-h{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.rail a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;text-decoration:none;color:var(--muted);font-size:14.5px}
+.rail a:hover{background:var(--band);color:var(--ink)}
+.rail .dot{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-family:var(--mono);font-size:11px;color:var(--faint);background:var(--surface)}
+.rail a.done .dot{background:var(--ok);border-color:var(--ok)}
+.rail a.done .dot::after{content:"";width:9px;height:5px;border-left:2px solid #FFFFFF;border-bottom:2px solid #FFFFFF;transform:rotate(-45deg) translate(1px,-1px)}
+.rail a.done .dot span{display:none}
+.meter{margin-top:14px;height:6px;border-radius:999px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--grad);transition:width .3s}
+.meter-t{font-family:var(--mono);font-size:12px;color:var(--faint);margin-top:6px}
+#aform{display:grid;gap:24px;min-width:0}
+#aform fieldset{border:1px solid var(--line);border-radius:14px;padding:26px 26px 28px;margin:0;display:grid;gap:22px;min-width:0;background:var(--surface)}
+#aform legend{display:contents}
+.fs-head{display:flex;gap:14px;align-items:baseline}
+.fs-num{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600;letter-spacing:.08em}
+.fs-title{font-size:21px;font-weight:600;line-height:1.3}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 20px}
+#aform .field{min-width:0}
+#aform .grid2{align-items:end}
+.req{color:var(--err);margin-left:2px}
+.hint{color:var(--faint);font-size:13.5px;line-height:1.5}
+.hint ul{margin:4px 0 0;padding-left:18px}
+#aform input[type=text],#aform input[type=email],#aform textarea,#aform select{width:100%;font:inherit;font-size:15.5px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:11px 13px;transition:border-color .15s,box-shadow .15s}
+#aform select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:36px}
+#aform input[readonly]{background:var(--band);color:var(--muted)}
+#aform textarea{min-height:130px;resize:vertical;line-height:1.55}
+#aform input:focus,#aform textarea:focus,#aform select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+#aform .field.invalid input,#aform .field.invalid textarea,#aform .field.invalid select{border-color:var(--err)}
+.group{display:grid;gap:10px;min-width:0}
+.group.invalid .err{display:block}
+.count{font-family:var(--mono);font-size:12px;color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
+.count.over{color:var(--err)}
+.pill,.seg,.chip{position:relative}
+.pill input,.seg input,.chip input{position:absolute;opacity:0;pointer-events:none}
+.pills,.chips{display:flex;flex-wrap:wrap;gap:8px}
+.pill span{display:inline-flex;align-items:center;padding:8px 14px;border:1.5px solid var(--line);border-radius:999px;font-size:14.5px;cursor:pointer;background:var(--surface)}
+.pill input:checked+span{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
+.chip span{display:inline-flex;align-items:center;gap:8px;padding:8px 13px 8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:14.5px;cursor:pointer;background:var(--surface)}
+.chip span::before{content:"";width:16px;height:16px;border-radius:4px;border:1.5px solid #C9CDD3;background:#FFFFFF;flex:none}
+.chip input:checked+span{border-color:var(--accent);background:var(--accent-soft)}
+.chip input:checked+span::before{background:var(--accent);border-color:var(--accent);box-shadow:inset 0 0 0 3px var(--accent-soft)}
+.segs{display:grid;gap:8px}
+.seg span{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer;font-size:15px;background:var(--surface)}
+.seg span::before{content:"";flex:none;width:18px;height:18px;border-radius:50%;border:1.5px solid #C9CDD3;background:#FFFFFF}
+.seg input:checked+span{border-color:var(--accent);background:var(--accent-soft)}
+.seg input:checked+span::before{border:5px solid var(--accent)}
+.pill input:focus-visible+span,.seg input:focus-visible+span,.chip input:focus-visible+span{outline:2.5px solid var(--accent);outline-offset:2px}
+.tchip span{border-top:3px solid var(--tc,var(--line))}
+.tc-ac{--tc:#7E4AA8}.tc-in{--tc:#3639FD}.tc-nc{--tc:#2F7F82}
+.other-in{margin-top:2px}
+.drop{display:grid;place-items:center;gap:6px;text-align:center;padding:26px 18px;border:1.5px dashed #C9CDD3;border-radius:12px;background:var(--band);cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop svg{width:28px;height:28px;fill:none;stroke:var(--accent);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.drop b{font-size:15px}
+.drop span{font-size:13.5px;color:var(--faint)}
+.file{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--ok);border-radius:10px;background:var(--ok-bg)}
+.file .fi{flex:none;width:36px;height:44px;border-radius:6px;background:#FFFFFF;border:1px solid #BFE3D5;display:grid;place-items:center;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--ok)}
+.file .fn{min-width:0;flex:1}
+.file .fn b{display:block;overflow-wrap:anywhere;font-size:14.5px}
+.file .fn span{font-size:13px;color:var(--muted)}
+.group.invalid .drop{border-color:var(--err)}
+.ai-note{display:flex;gap:10px;padding:10px 12px;border-radius:8px;background:var(--amber-bg);color:var(--amber);font-size:13.5px;line-height:1.5}
+.f-submit{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center;justify-content:space-between;padding:22px 26px;border-radius:14px;background:var(--grad);color:#FFFFFF}
+.f-submit p{font-size:14.5px;opacity:.92;max-width:50ch}
+.f-submit .btns{display:flex;flex-wrap:wrap;gap:10px}
+.btn.white{background:#FFFFFF;border-color:#FFFFFF;color:var(--accent)}
+.btn.ghost-w{border-color:rgba(255,255,255,.7);color:#FFFFFF}
+.btn.white:hover,.btn.ghost-w:hover{box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+.btn.sm{padding:8px 14px;font-size:14px}
+.status-pill.draft{background:var(--accent-soft);color:var(--accent)}
+.status-pill.sub{background:var(--ok-bg);color:var(--ok)}
+@media (max-width:900px){
+  .f-intro .wrap{grid-template-columns:1fr;gap:20px}
+  .flayout{grid-template-columns:1fr;gap:18px;padding-top:22px}
+  .rail{position:static;grid-auto-flow:column;grid-auto-columns:max-content;overflow-x:auto;gap:6px;scrollbar-width:none}
+  .rail::-webkit-scrollbar{display:none}
+  .rail-h,.meter,.meter-t{display:none}
+  .rail a{border:1px solid var(--line);font-size:13.5px;padding:7px 10px}
+}
+@media (max-width:640px){
+  #aform fieldset{padding:20px 16px 22px}
+  .grid2{grid-template-columns:1fr}
+  .f-submit{padding:20px 18px}
+  .f-submit .btns,.f-submit .btn{width:100%}
+  .fnav .brand span{display:none}
+}
+</style>
+
+<div class="split" id="split">
+  <aside class="brandside">
+    <a class="brand" href="https://edinburghbiohackathon.co.uk/"><img src="img/mark-white.png" alt="">Edinburgh BioHackathon</a>
+    <div class="pitch">
+      <span class="eyebrow">Applications · 2027 edition</span>
+      <h1>Apply to hack with us</h1>
+      <p>48 hours, interdisciplinary teams and real challenges from labs and companies. Sign in to start, save and track your application.</p>
+    </div>
+    <dl class="facts">
+      <div><dt>When</dt><dd>Spring / early summer 2027</dd></div>
+      <div><dt>Where</dt><dd>University of Edinburgh</dd></div>
+      <div><dt>Format</dt><dd>48 hours · teams of 4–6</dd></div>
+      <div><dt>Who</dt><dd>Students, postdocs and staff</dd></div>
+    </dl>
+  </aside>
+
+  <main class="formside">
+    <div class="topbar"><a class="back" href="https://edinburghbiohackathon.co.uk/">← Back to site</a></div>
+    <div class="center">
+
+      <!-- Step 1: email -->
+      <form class="card" id="v-email" novalidate>
+        <div>
+          <span class="step">Sign in</span>
+          <h2>Sign in to your application</h2>
+          <p class="sub">New here? Enter your email and we'll create your account.</p>
+        </div>
+        <div class="field" id="f-email">
+          <label class="lab" for="email">Email address</label>
+          <input type="email" id="email" name="email" autocomplete="email" inputmode="email" placeholder="you@ed.ac.uk" required>
+          <span class="err">Enter a valid email address, like name@ed.ac.uk.</span>
+        </div>
+        <div class="alert" id="a-email" role="alert"></div>
+        <button class="btn primary block" type="submit" id="b-send">Email me a sign-in code</button>
+        <p class="note"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>No password needed. We use your email only to manage your application and to contact you about Edinburgh BioHackathon.</span></p>
+      </form>
+
+      <!-- Step 2: code -->
+      <form class="card" id="v-code" novalidate hidden>
+        <div>
+          <span class="step">Check your inbox</span>
+          <h2>Enter your 6-digit code</h2>
+          <p class="sub">We sent it to <b id="sent-to"></b>. It expires in 10 minutes.</p>
+        </div>
+        <span class="preview" id="code-preview" hidden>Preview · any 6 digits will work</span>
+        <div class="otp" id="otp" role="group" aria-label="6-digit code">
+          <input id="d0" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Digit 1">
+          <input id="d1" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+          <input id="d2" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+          <input id="d3" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+          <input id="d4" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+          <input id="d5" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+        </div>
+        <div class="alert" id="a-code" role="alert"></div>
+        <button class="btn primary block" type="submit" id="b-verify" disabled>Sign in</button>
+        <div class="row">
+          <span>Didn't get it? <button class="link" type="button" id="b-resend" disabled>Resend code</button> <span class="timer" id="timer"></span></span>
+          <button class="link" type="button" id="b-change">Use a different email</button>
+        </div>
+        <p class="note"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><span>Check your junk folder. University addresses sometimes hold new senders for a few minutes.</span></p>
+      </form>
+
+      <!-- Step 3: applicant home -->
+      <section class="card wide" id="v-home" hidden>
+        <div>
+          <span class="step">Your application</span>
+          <h2>You're signed in</h2>
+          <p class="sub">Your progress is saved to your account. Come back any time before the deadline.</p>
+        </div>
+        <div class="who"><span>Signed in as <b id="who-email"></b></span><span class="status-pill" id="status">Not started</span></div>
+        <ol class="timeline">
+          <li class="done"><span class="mk"></span><div><div class="tl-t">Account created</div><div class="tl-d">You can sign in with this email at any time.</div></div></li>
+          <li class="now"><span class="mk">2</span><div><div class="tl-t">Complete your application</div><div class="tl-d">Your background, skills, challenge interests and CV. It takes about 15 minutes and saves as you go.</div></div></li>
+          <li><span class="mk">3</span><div><div class="tl-t">Committee review</div><div class="tl-d">We select a balanced cohort across wet-lab, dry-lab, computational and non-coding backgrounds.</div></div></li>
+          <li><span class="mk">4</span><div><div class="tl-t">Decision by email</div><div class="tl-d">You'll hear from us after applications close.</div></div></li>
+          <li><span class="mk">5</span><div><div class="tl-t">Confirm your place</div><div class="tl-d">Confirm attendance for all three days, dietary needs and access requirements.</div></div></li>
+        </ol>
+        <div class="toast" id="toast" role="status"></div>
+        <div class="actions">
+          <button class="btn primary" type="button" id="b-start">Start application →</button>
+          <button class="link" type="button" id="b-out">Sign out</button>
+        </div>
+      </section>
+
+    </div>
+    <p class="foot">Questions? Email biohackathon@ed.ac.uk</p>
+  </main>
+</div>
+
+<div id="v-form" hidden>
+  <header class="fnav"><div class="wrap">
+    <span class="brand"><img src="img/mark-blue.png" alt=""><span>Edinburgh BioHackathon</span></span>
+    <span class="spacer"></span>
+    <span class="saved" id="saved" aria-live="polite"></span>
+    <button class="btn sm" type="button" id="b-exit">Save and exit</button>
+  </div></header>
+  <section class="f-intro"><div class="wrap">
+    <div>
+      <span class="eyebrow">Application · 2027 edition</span>
+      <h1>Your application</h1>
+      <p class="lede">Tell us about yourself, your interests and skills, and upload your CV. Your answers help us form balanced teams and make the right arrangements for the event. You can save and come back, and edit after submitting until applications close.</p>
+    </div>
+    <div class="before"><b>Before you start</b>
+      <ol>
+        <li>Add teammates if you already know who you'd like to work with. Otherwise there is an in-person networking session before the hackathon.</li>
+        <li>Challenge preferences are for information only. Sponsors present all challenges at the opening ceremony, and you choose then.</li>
+        <li>Teams (4–6 people) and challenges are confirmed on the day.</li>
+        <li>Please don't use generative AI for your application. Short answers and bullet points are best.</li>
+        <li>During the hackathon itself, generative AI is welcome.</li>
+      </ol>
+    </div>
+  </div></section>
+
+  <div class="wrap flayout">
+    <nav class="rail" aria-label="Application sections">
+      <span class="rail-h">Sections</span>
+      <a href="#a-you" data-sec="a-you"><span class="dot"><span>1</span></span>About you</a>
+      <a href="#a-exp" data-sec="a-exp"><span class="dot"><span>2</span></span>Experience</a>
+      <a href="#a-int" data-sec="a-int"><span class="dot"><span>3</span></span>Interests &amp; CV</a>
+      <a href="#a-team" data-sec="a-team"><span class="dot"><span>4</span></span>Team</a>
+      <a href="#a-log" data-sec="a-log"><span class="dot"><span>5</span></span>Logistics</a>
+      <div class="meter" aria-hidden="true"><i id="ameter"></i></div>
+      <div class="meter-t" id="ameter-t">0 of 5 sections complete</div>
+    </nav>
+
+    <form id="aform" novalidate>
+      <fieldset id="a-you">
+        <legend><div class="fs-head"><span class="fs-num">01</span><span class="fs-title">About you</span></div></legend>
+        <div class="grid2">
+          <div class="field"><label class="lab" for="q-name">Full name<span class="req">*</span></label><input type="text" id="q-name" name="full_name" autocomplete="name" required><span class="err">Enter your full name.</span></div>
+          <div class="field"><label class="lab" for="q-email">Email address</label><input type="email" id="q-email" name="email" readonly title="The email you signed in with"></div>
+          <div class="field"><label class="lab" for="q-pron">Pronouns</label><input type="text" id="q-pron" name="pronouns" placeholder="e.g. she/her, he/him, they/them"></div>
+          <div class="field"><label class="lab" for="q-city">From which city will you be travelling to the hackathon?<span class="req">*</span></label><input type="text" id="q-city" name="city" required><span class="err">Enter the city you're travelling from.</span></div>
+          <div class="field full" style="grid-column:1/-1"><label class="lab" for="q-inst">University / Institution and Department<span class="req">*</span></label><input type="text" id="q-inst" name="institution" placeholder="e.g. University of Edinburgh, School of Biological Sciences" required><span class="err">Enter your institution and department.</span></div>
+          <div class="field"><label class="lab" for="q-level">Level / Role<span class="req">*</span></label>
+            <select id="q-level" name="level" required><option value="">Select one</option><option>Undergraduate Student</option><option>Master's Student</option><option>PhD Student</option><option>Postdoctoral Researcher</option><option>Academic Staff / Faculty</option><option>Other</option></select><span class="err">Select your level or role.</span></div>
+          <div class="field"><label class="lab" for="q-field">Field(s) of study or areas of expertise<span class="req">*</span></label><input type="text" id="q-field" name="fields" placeholder="e.g. Biology, Computer Science, Data Science" required><span class="err">Enter your field(s).</span></div>
+        </div>
+      </fieldset>
+
+      <fieldset id="a-exp">
+        <legend><div class="fs-head"><span class="fs-num">02</span><span class="fs-title">Experience</span></div></legend>
+        <div class="grid2">
+          <div class="field"><label class="lab" for="q-place">How many (industrial/academic) placement experiences have you completed?<span class="req">*</span></label><select id="q-place" name="placements" required><option value="">Select one</option><option>0</option><option>1</option><option>2</option><option>3 or more</option></select><span class="err">Select a number.</span></div>
+          <div class="field"><label class="lab" for="q-hack">How many hackathons have you participated in?<span class="req">*</span></label><select id="q-hack" name="hackathons" required><option value="">Select one</option><option>0</option><option>1</option><option>2</option><option>3 or more</option></select><span class="err">Select a number.</span></div>
+        </div>
+        <div class="field"><label class="lab" for="q-proj">Briefly describe your past project experience (academic/non-academic) and the tech stack / technical skills involved.<span class="req">*</span></label><span class="hint">e.g. Docking project: AutoDock Vina, PyTorch, TensorFlow</span><textarea id="q-proj" name="project_experience" data-max="1500" required></textarea><span class="count" data-for="q-proj"></span><span class="err">Describe your past project experience.</span></div>
+        <div class="field"><label class="lab" for="q-skills">What skills or technical expertise can you contribute to the hackathon?<span class="req">*</span></label><textarea id="q-skills" name="skills" data-max="1200" required></textarea><span class="count" data-for="q-skills"></span><span class="err">Describe the skills you can contribute.</span></div>
+      </fieldset>
+
+      <fieldset id="a-int">
+        <legend><div class="fs-head"><span class="fs-num">03</span><span class="fs-title">Interests &amp; CV</span></div></legend>
+        <div class="group" data-group="tracks">
+          <span class="lab" id="lab-tr">Which challenge track(s) are you interested in?<span class="req">*</span></span>
+          <span class="hint">Select all that apply. This is not a final choice: teams and challenges are confirmed on the day.</span>
+          <div class="chips" role="group" aria-labelledby="lab-tr">
+            <label class="chip tchip tc-ac"><input type="checkbox" name="tracks" id="t-ac" value="Academic Research Track"><span>Academic Research Track</span></label>
+            <label class="chip tchip tc-in"><input type="checkbox" name="tracks" id="t-in" value="Industrial Innovation Track"><span>Industrial Innovation Track</span></label>
+            <label class="chip tchip tc-nc"><input type="checkbox" name="tracks" id="t-nc" value="Non-Coder Problem-Solving Track"><span>Non-Coder Problem-Solving Track</span></label>
+            <label class="chip"><input type="checkbox" name="tracks" id="t-ns" value="Not sure / No preference"><span>Not sure / No preference</span></label>
+          </div>
+          <span class="err">Select at least one option.</span>
+        </div>
+        <div class="field"><label class="lab" for="q-hope">Briefly describe what you hope to achieve by participating in the BioHackathon<span class="req">*</span></label>
+          <div class="ai-note">Friendly reminder: please avoid using generative AI during the application process. It is very easy to spot and doesn't reflect your profile well.</div>
+          <textarea id="q-hope" name="hopes" data-max="1200" required></textarea><span class="count" data-for="q-hope"></span><span class="err">Tell us what you hope to achieve.</span></div>
+        <div class="group" data-group="cv">
+          <span class="lab" id="lab-cv">Upload your CV or résumé<span class="req">*</span></span>
+          <span class="hint">PDF or Word, max 2 pages and 5 MB. Your CV should show both soft and technical skills and experiences. You can replace it until applications close.</span>
+          <label class="drop" id="drop" for="q-cv"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg><b>Drop your CV here or choose a file</b><span>.pdf, .doc or .docx</span></label>
+          <input type="file" id="q-cv" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+          <div class="file" id="cv-file" hidden><span class="fi" id="cv-ext">PDF</span><span class="fn"><b id="cv-name"></b><span id="cv-meta"></span></span><button class="link" type="button" id="cv-replace">Replace</button></div>
+          <span class="err" id="cv-err">Upload your CV as a PDF or Word file.</span>
+        </div>
+      </fieldset>
+
+      <fieldset id="a-team">
+        <legend><div class="fs-head"><span class="fs-num">04</span><span class="fs-title">Team</span></div></legend>
+        <div class="group" data-group="team">
+          <span class="lab" id="lab-team">Do you already know who you would like to work with?<span class="req">*</span></span>
+          <span class="hint">Each team will have 4–6 people. This is a yes or no question; add names in the next box.</span>
+          <div class="segs" role="radiogroup" aria-labelledby="lab-team">
+            <label class="seg"><input type="radio" name="team" id="tm-yes" value="Yes, I already know people I would like to work with"><span>Yes, I already know people I would like to work with</span></label>
+            <label class="seg"><input type="radio" name="team" id="tm-self" value="No, I will find my teammates myself before the hackathon"><span>No, I will find my teammates myself before the hackathon</span></label>
+            <label class="seg"><input type="radio" name="team" id="tm-match" value="No, please match me up"><span>No, please match me up</span></label>
+            <label class="seg"><input type="radio" name="team" id="tm-other" value="Other"><span>Other</span></label>
+          </div>
+          <input type="text" class="other-in" id="q-team-other" name="team_other" placeholder="Please specify" hidden>
+          <span class="err">Choose one option.</span>
+        </div>
+        <div class="field" id="team-details"><label class="lab" for="q-teammates">If you already have people you would like to work with, list your team name, members and their emails</label>
+          <div class="hint">Optional, 4–6 people per team. Please note:<ul><li>Listing names does not guarantee that everyone listed is selected or placed on the same team.</li><li>Your teammates still need to submit their own application. No application, no participation.</li><li>Final teams and challenges are confirmed in person on the day.</li><li>If you don't have a team yet, there is an in-person networking and team-formation session before hacking begins.</li></ul></div>
+          <textarea id="q-teammates" name="teammates" data-max="1000" style="min-height:100px"></textarea><span class="count" data-for="q-teammates"></span></div>
+      </fieldset>
+
+      <fieldset id="a-log">
+        <legend><div class="fs-head"><span class="fs-num">05</span><span class="fs-title">Logistics</span></div></legend>
+        <div class="group" data-group="diet">
+          <span class="lab" id="lab-diet">Do you have any dietary restrictions or food preferences?<span class="req">*</span></span>
+          <span class="hint">Select all that apply.</span>
+          <div class="chips" role="group" aria-labelledby="lab-diet">
+            <label class="chip"><input type="checkbox" name="diet" id="dt-none" value="No dietary restrictions / None"><span>No dietary restrictions / None</span></label>
+            <label class="chip"><input type="checkbox" name="diet" id="dt-veg" value="Vegetarian"><span>Vegetarian</span></label>
+            <label class="chip"><input type="checkbox" name="diet" id="dt-vegan" value="Vegan"><span>Vegan</span></label>
+            <label class="chip"><input type="checkbox" name="diet" id="dt-gf" value="Gluten-free"><span>Gluten-free</span></label>
+            <label class="chip"><input type="checkbox" name="diet" id="dt-halal" value="Halal"><span>Halal</span></label>
+            <label class="chip"><input type="checkbox" name="diet" id="dt-kosher" value="Kosher"><span>Kosher</span></label>
+            <label class="chip"><input type="checkbox" name="diet" id="dt-other" value="Other"><span>Other</span></label>
+          </div>
+          <input type="text" class="other-in" id="q-diet-other" name="diet_other" placeholder="Please specify" hidden>
+          <span class="err">Select at least one option.</span>
+        </div>
+        <div class="group" data-group="travel">
+          <span class="lab" id="lab-trav">Do you require travel support (e.g. travel reimbursement or accommodation)?<span class="req">*</span></span>
+          <span class="hint">We may be able to support up to £60 in travel grants for anyone travelling from outside Edinburgh, subject to availability and proof of receipts. We'll be in touch if you are granted travel support.</span>
+          <div class="segs" role="radiogroup" aria-labelledby="lab-trav">
+            <label class="seg"><input type="radio" name="travel" id="tv-no" value="No travel support needed"><span>No travel support needed</span></label>
+            <label class="seg"><input type="radio" name="travel" id="tv-yes" value="Yes, I require support (please specify)"><span>Yes, I require support (please specify below)</span></label>
+          </div>
+          <span class="err">Choose one option.</span>
+        </div>
+        <div class="field" id="travel-details" hidden><label class="lab" for="q-travel">Details of your travel support needs</label><span class="hint">e.g. estimated travel costs. We can only reimburse on proof of receipts.</span><textarea id="q-travel" name="travel_details" data-max="600" style="min-height:90px"></textarea><span class="count" data-for="q-travel"></span></div>
+        <div class="grid2">
+          <div class="field"><label class="lab" for="q-tshirt">What T-shirt size do you require?<span class="req">*</span></label><select id="q-tshirt" name="tshirt" required><option value="">Select one</option><option>Extra Small (XS)</option><option>Small (S)</option><option>Medium (M)</option><option>Large (L)</option><option>Extra Large (XL)</option><option>I don't want a T-shirt</option></select><span class="err">Select a size.</span></div>
+        </div>
+        <div class="field"><label class="lab" for="q-access">Do you have any accessibility needs or special accommodations we should be aware of?</label><span class="hint">Optional.</span><textarea id="q-access" name="accessibility" data-max="800" style="min-height:90px"></textarea><span class="count" data-for="q-access"></span></div>
+        <div class="group" data-group="photo">
+          <span class="lab" id="lab-photo">There may be photography and video at the event. Do you agree for any photo or video taken to be used for promotional purposes?<span class="req">*</span></span>
+          <div class="pills" role="radiogroup" aria-labelledby="lab-photo">
+            <label class="pill"><input type="radio" name="photo" id="ph-yes" value="Yes"><span>Yes</span></label>
+            <label class="pill"><input type="radio" name="photo" id="ph-no" value="No"><span>No</span></label>
+          </div>
+          <span class="err">Choose one option.</span>
+        </div>
+      </fieldset>
+
+      <div class="alert" id="a-form" role="alert"></div>
+      <div class="f-submit">
+        <p id="submit-copy">Check your answers, then submit. You can still edit your application until applications close.</p>
+        <div class="btns"><button class="btn ghost-w" type="button" id="b-save">Save draft</button><button class="btn white" type="submit" id="b-submit">Submit application →</button></div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(function(){
+  // On the live site these routes are served by the backend; anywhere else the page runs as a preview and sends nothing.
+  var LIVE = /(^|\.)edinburghbiohackathon\.co\.uk$/.test(location.hostname);
+  var API = {request:'/api/auth/request', verify:'/api/auth/verify', me:'/api/me', logout:'/api/auth/logout'};
+  var RESEND_SECONDS = 30;
+
+  var vEmail=document.getElementById('v-email'), vCode=document.getElementById('v-code'), vHome=document.getElementById('v-home');
+  var emailIn=document.getElementById('email'), fEmail=document.getElementById('f-email');
+  var digits=[0,1,2,3,4,5].map(function(i){return document.getElementById('d'+i)});
+  var bVerify=document.getElementById('b-verify'), bResend=document.getElementById('b-resend'), timerEl=document.getElementById('timer');
+  var current='', tick=null;
+
+  function show(v){[vEmail,vCode,vHome].forEach(function(x){x.hidden=(x!==v)})}
+  function alertMsg(id,msg){var a=document.getElementById(id);a.textContent=msg||'';a.classList.toggle('show',!!msg)}
+  function emailOk(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
+  function post(url,body){
+    return fetch(url,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})})
+      .then(function(r){return r.json().catch(function(){return {}}).then(function(j){j.ok=r.ok;j.status=r.status;return j})});
+  }
+
+  function startTimer(){
+    clearInterval(tick);var left=RESEND_SECONDS;bResend.disabled=true;
+    function draw(){timerEl.textContent=left>0?('in 0:'+(left<10?'0':'')+left):''}
+    draw();
+    tick=setInterval(function(){left--;draw();if(left<=0){clearInterval(tick);bResend.disabled=false}},1000);
+  }
+
+  function sendCode(){
+    var v=emailIn.value.trim().toLowerCase();
+    if(!emailOk(v)){fEmail.classList.add('invalid');emailIn.focus();return Promise.resolve(false)}
+    fEmail.classList.remove('invalid');alertMsg('a-email','');
+    current=v;
+    if(!LIVE) return Promise.resolve(true);
+    return post(API.request,{email:v}).then(function(j){
+      if(j.ok) return true;
+      alertMsg('a-email', j.status===429?'Too many attempts. Wait a few minutes, then try again.':'We could not send a code just now. Try again in a minute.');
+      return false;
+    }).catch(function(){alertMsg('a-email','We could not reach the server. Check your connection and try again.');return false});
+  }
+
+  vEmail.addEventListener('submit',function(e){
+    e.preventDefault();
+    var b=document.getElementById('b-send');b.disabled=true;b.textContent='Sending…';
+    sendCode().then(function(ok){
+      b.disabled=false;b.textContent='Email me a sign-in code';
+      if(!ok) return;
+      document.getElementById('sent-to').textContent=current;
+      document.getElementById('code-preview').hidden=LIVE;
+      digits.forEach(function(d){d.value='';d.classList.remove('filled')});
+      document.getElementById('otp').classList.remove('bad');alertMsg('a-code','');bVerify.disabled=true;
+      show(vCode);startTimer();setTimeout(function(){digits[0].focus()},50);
+    });
+  });
+  emailIn.addEventListener('input',function(){if(fEmail.classList.contains('invalid')&&emailOk(emailIn.value.trim())) fEmail.classList.remove('invalid')});
+
+  function code(){return digits.map(function(d){return d.value}).join('')}
+  function refresh(){
+    digits.forEach(function(d){d.classList.toggle('filled',!!d.value)});
+    bVerify.disabled=code().length!==6;
+    document.getElementById('otp').classList.remove('bad');
+  }
+  function fill(str,from){
+    var s=(str||'').replace(/\D/g,'').slice(0,6-from);
+    for(var i=0;i<s.length;i++) digits[from+i].value=s[i];
+    refresh();
+    var next=Math.min(from+s.length,5);digits[next].focus();
+    if(code().length===6) vCode.requestSubmit ? vCode.requestSubmit() : bVerify.click();
+  }
+  digits.forEach(function(d,i){
+    d.addEventListener('input',function(){
+      var v=d.value.replace(/\D/g,'');
+      if(v.length>1){d.value='';fill(v,i);return}
+      d.value=v;refresh();
+      if(v && i<5) digits[i+1].focus();
+      if(code().length===6) vCode.requestSubmit ? vCode.requestSubmit() : bVerify.click();
+    });
+    d.addEventListener('keydown',function(e){
+      if(e.key==='Backspace' && !d.value && i>0){digits[i-1].value='';digits[i-1].focus();refresh();e.preventDefault()}
+      else if(e.key==='ArrowLeft' && i>0){digits[i-1].focus();e.preventDefault()}
+      else if(e.key==='ArrowRight' && i<5){digits[i+1].focus();e.preventDefault()}
+    });
+    d.addEventListener('paste',function(e){var t=(e.clipboardData||window.clipboardData).getData('text');if(t){e.preventDefault();fill(t,i)}});
+    d.addEventListener('focus',function(){d.select()});
+  });
+
+  function signedIn(email,status){
+    document.getElementById('who-email').textContent=email;
+    document.getElementById('toast').classList.remove('show');
+    app={status:status||'Not started',data:{},cv:null};
+    loadApp().then(function(){paintHome();show(vHome)});
+  }
+
+  vCode.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(code().length!==6||bVerify.textContent==='Checking…') return;
+    alertMsg('a-code','');
+    if(!LIVE){clearInterval(tick);signedIn(current,'Not started');return}
+    bVerify.disabled=true;bVerify.textContent='Checking…';
+    post(API.verify,{email:current,code:code()}).then(function(j){
+      bVerify.textContent='Sign in';
+      if(j.ok){clearInterval(tick);signedIn(current,j.status_label);return}
+      document.getElementById('otp').classList.add('bad');
+      alertMsg('a-code', j.status===410?'This code has expired. Request a new one.':j.status===429?'Too many attempts. Request a new code.':'That code is not right. Check the email and try again.');
+      digits.forEach(function(x){x.value=''});digits[0].focus();bVerify.disabled=true;
+    }).catch(function(){bVerify.textContent='Sign in';bVerify.disabled=false;alertMsg('a-code','We could not reach the server. Try again.')});
+  });
+
+  bResend.addEventListener('click',function(){
+    bResend.disabled=true;
+    sendCode().then(function(ok){
+      if(ok){startTimer();alertMsg('a-code','');var p=document.getElementById('code-preview');if(LIVE){p.hidden=false;p.textContent='New code sent';setTimeout(function(){p.hidden=true},4000)}}
+      else bResend.disabled=false;
+    });
+  });
+  document.getElementById('b-change').addEventListener('click',function(){clearInterval(tick);show(vEmail);emailIn.focus();emailIn.select()});
+
+  document.getElementById('b-start').addEventListener('click',function(){openForm()});
+  document.getElementById('b-out').addEventListener('click',function(){
+    var done=function(){current='';emailIn.value='';show(vEmail);emailIn.focus()};
+    if(LIVE) post(API.logout).finally(done); else done();
+  });
+
+  // ===== Application form =====
+  var APP_API={get:'/api/application', save:'/api/application', submit:'/api/application/submit', cv:'/api/application/cv'};
+  var app={status:'Not started', data:{}, cv:null};
+  var aform=document.getElementById('aform'), split=document.getElementById('split'), vForm=document.getElementById('v-form');
+  var ASECS=['a-you','a-exp','a-int','a-team','a-log'];
+  var AREQ={'a-you':['q-name','q-city','q-inst','q-level','q-field'],'a-exp':['q-place','q-hack','q-proj','q-skills'],'a-int':['@tracks','q-hope','#cv'],'a-team':['@team'],'a-log':['@diet','@travel','q-tshirt','@photo']};
+  var RADIOS=['team','travel','photo'], CHECKS=['tracks','diet'];
+  function draftKey(){return 'ebh-app-'+current}
+  function gv(n){return Array.prototype.map.call(aform.querySelectorAll('input[name="'+n+'"]:checked'),function(i){return i.value})}
+  function okItem(it){
+    if(it==='#cv') return !!app.cv;
+    if(it.charAt(0)==='@'){
+      var g=it.slice(1),v=gv(g);if(!v.length) return false;
+      if(g==='team'&&v[0]==='Other') return !!document.getElementById('q-team-other').value.trim();
+      if(g==='diet'&&v.indexOf('Other')>-1) return !!document.getElementById('q-diet-other').value.trim();
+      return true;
+    }
+    var el=document.getElementById(it),m=+el.getAttribute('data-max');
+    if(m&&el.value.length>m) return false;
+    return !!el.value.trim();
+  }
+  function mark(it,ok){
+    var h=it==='#cv'?aform.querySelector('[data-group="cv"]'):it.charAt(0)==='@'?aform.querySelector('[data-group="'+it.slice(1)+'"]'):document.getElementById(it).closest('.field');
+    if(h) h.classList.toggle('invalid',!ok);
+  }
+  function arail(){
+    var n=0;ASECS.forEach(function(s){var d=AREQ[s].every(okItem);if(d)n++;vForm.querySelector('.rail a[data-sec="'+s+'"]').classList.toggle('done',d)});
+    document.getElementById('ameter').style.width=(n/ASECS.length*100)+'%';
+    document.getElementById('ameter-t').textContent=n+' of '+ASECS.length+' sections complete';
+  }
+  function acounts(){vForm.querySelectorAll('.count').forEach(function(c){var el=document.getElementById(c.getAttribute('data-for')),m=+el.getAttribute('data-max');c.textContent=el.value.length.toLocaleString()+' / '+m.toLocaleString();c.classList.toggle('over',el.value.length>m)})}
+  function conditionals(){
+    document.getElementById('q-team-other').hidden=gv('team')[0]!=='Other';
+    document.getElementById('q-diet-other').hidden=gv('diet').indexOf('Other')<0;
+    document.getElementById('travel-details').hidden=gv('travel')[0]!=='Yes, I require support (please specify)';
+  }
+  function acollect(){
+    var d={};
+    aform.querySelectorAll('input[type=text],textarea,select').forEach(function(el){if(el.name) d[el.name]=el.value});
+    RADIOS.forEach(function(n){d[n]=gv(n)[0]||''});CHECKS.forEach(function(n){d[n]=gv(n)});
+    d.email=current;return d;
+  }
+  function afill(d){
+    aform.reset();
+    aform.querySelectorAll('input[type=text],textarea,select').forEach(function(el){if(el.name&&typeof d[el.name]==='string') el.value=d[el.name]});
+    RADIOS.forEach(function(n){aform.querySelectorAll('input[name="'+n+'"]').forEach(function(i){i.checked=(i.value===d[n])})});
+    CHECKS.forEach(function(n){aform.querySelectorAll('input[name="'+n+'"]').forEach(function(i){i.checked=(d[n]||[]).indexOf(i.value)>-1})});
+    document.getElementById('q-email').value=current;
+    showCv();conditionals();acounts();arail();
+    aform.querySelectorAll('.invalid').forEach(function(x){x.classList.remove('invalid')});
+  }
+  function showCv(){
+    var has=!!app.cv;document.getElementById('drop').hidden=has;document.getElementById('cv-file').hidden=!has;
+    if(has){document.getElementById('cv-name').textContent=app.cv.name;document.getElementById('cv-meta').textContent=(app.cv.size/1024/1024).toFixed(2)+' MB'+(LIVE?' · uploaded':' · preview, not uploaded');document.getElementById('cv-ext').textContent=(app.cv.name.split('.').pop()||'').toUpperCase().slice(0,4)}
+  }
+  function stamp(t){document.getElementById('saved').textContent=t}
+  function persist(){
+    app.data=acollect();if(app.status==='Not started') app.status='Draft';
+    if(LIVE) return fetch(APP_API.save,{method:'PUT',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(app.data)}).then(function(r){if(!r.ok) throw 0;stamp('Saved · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}))}).catch(function(){stamp('Not saved. Check your connection.')});
+    try{localStorage.setItem(draftKey(),JSON.stringify({status:app.status,data:app.data,cv:app.cv}))}catch(e){}
+    stamp('Saved on this device · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+    return Promise.resolve();
+  }
+  var st;function autosave(){clearTimeout(st);stamp('Saving…');st=setTimeout(persist,900)}
+  function loadApp(){
+    if(LIVE) return fetch(APP_API.get,{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).then(function(j){if(j){app.status=j.status_label||app.status;app.data=j.data||{};app.cv=j.cv||null}}).catch(function(){});
+    try{var j=JSON.parse(localStorage.getItem(draftKey())||'null');if(j){app.status=j.status;app.data=j.data||{};app.cv=j.cv||null}}catch(e){}
+    return Promise.resolve();
+  }
+  function paintHome(){
+    var pill=document.getElementById('status');pill.textContent=app.status;
+    pill.className='status-pill'+(app.status==='Draft'?' draft':app.status==='Submitted'?' sub':'');
+    var lis=vHome.querySelectorAll('.timeline li');
+    var sub=app.status==='Submitted';
+    lis[1].className=sub?'done':'now';lis[2].className=sub?'now':'';
+    lis[1].querySelector('.mk').textContent=sub?'':'2';lis[2].querySelector('.mk').textContent=sub?'3':'3';
+    document.getElementById('b-start').textContent=sub?'View or edit application':app.status==='Draft'?'Continue application →':'Start application →';
+  }
+  function openForm(){
+    afill(app.data||{});
+    document.getElementById('submit-copy').textContent=app.status==='Submitted'?'You have already submitted. Saving again updates your application.':'Check your answers, then submit. You can still edit your application until applications close.';
+    document.getElementById('b-submit').textContent=app.status==='Submitted'?'Update application →':'Submit application →';
+    stamp(app.status==='Not started'?'':'All changes saved');
+    split.hidden=true;vForm.hidden=false;window.scrollTo(0,0);
+    setTimeout(function(){document.getElementById('q-name').focus({preventScroll:true})},50);
+  }
+  function closeForm(msg){
+    vForm.hidden=true;split.hidden=false;paintHome();show(vHome);window.scrollTo(0,0);
+    var t=document.getElementById('toast');if(msg){t.textContent=msg;t.classList.add('show')}else t.classList.remove('show');
+  }
+
+  aform.addEventListener('input',function(e){
+    conditionals();acounts();arail();autosave();
+    var h=e.target.closest('.field,.group');
+    if(h&&h.classList.contains('invalid')){ASECS.forEach(function(s){AREQ[s].forEach(function(it){var hit=it===e.target.id||it==='@'+e.target.name||(it==='@team'&&e.target.id==='q-team-other')||(it==='@diet'&&e.target.id==='q-diet-other');if(hit) mark(it,okItem(it))})})}
+  });
+  aform.addEventListener('change',function(){conditionals();arail()});
+
+  // CV picker
+  var cvIn=document.getElementById('q-cv'), drop=document.getElementById('drop');
+  function takeFile(f){
+    var err=document.getElementById('cv-err'), g=aform.querySelector('[data-group="cv"]');
+    if(!f) return;
+    if(!/\.(pdf|docx?)$/i.test(f.name)){err.textContent='That file type is not accepted. Upload a PDF or Word file.';g.classList.add('invalid');return}
+    if(f.size>5*1024*1024){err.textContent='That file is larger than 5 MB. Export a smaller PDF and try again.';g.classList.add('invalid');return}
+    err.textContent='Upload your CV as a PDF or Word file.';g.classList.remove('invalid');
+    var meta={name:f.name,size:f.size};
+    if(LIVE){
+      stamp('Uploading CV…');var fd=new FormData();fd.append('cv',f);
+      fetch(APP_API.cv,{method:'POST',credentials:'same-origin',body:fd}).then(function(r){if(!r.ok) throw 0;app.cv=meta;showCv();arail();persist()}).catch(function(){err.textContent='The upload failed. Try again.';g.classList.add('invalid');stamp('')});
+    } else {app.cv=meta;showCv();arail();persist()}
+  }
+  cvIn.addEventListener('change',function(){takeFile(cvIn.files[0]);cvIn.value=''});
+  document.getElementById('cv-replace').addEventListener('click',function(){cvIn.click()});
+  ['dragenter','dragover'].forEach(function(ev){drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.add('over')})});
+  ['dragleave','drop'].forEach(function(ev){drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.remove('over')})});
+  drop.addEventListener('drop',function(e){takeFile(e.dataTransfer.files[0])});
+
+  document.getElementById('b-save').addEventListener('click',function(){clearTimeout(st);persist()});
+  document.getElementById('b-exit').addEventListener('click',function(){clearTimeout(st);persist().then(function(){closeForm(app.status==='Submitted'?'Your application is up to date.':'Draft saved. You can continue any time before applications close.')})});
+
+  aform.addEventListener('submit',function(e){
+    e.preventDefault();
+    var al=document.getElementById('a-form');al.classList.remove('show');
+    var first=null;
+    ASECS.forEach(function(s){AREQ[s].forEach(function(it){var ok=okItem(it);mark(it,ok);if(!ok&&!first) first=it})});
+    arail();
+    if(first){
+      al.textContent='Some answers are missing or need fixing. They are marked in red.';al.classList.add('show');
+      var h=first==='#cv'?aform.querySelector('[data-group="cv"]'):first.charAt(0)==='@'?aform.querySelector('[data-group="'+first.slice(1)+'"]'):document.getElementById(first).closest('.field');
+      h.scrollIntoView({block:'center'});return;
+    }
+    var was=app.status;app.data=acollect();
+    var finish=function(){app.status='Submitted';app.data.submitted_at=new Date().toISOString();if(!LIVE){try{localStorage.setItem(draftKey(),JSON.stringify({status:app.status,data:app.data,cv:app.cv}))}catch(x){}}
+      closeForm(was==='Submitted'?'Application updated.':(LIVE?'Application submitted. We have emailed you a confirmation. You can edit it until applications close.':'Preview: application submitted. On the live site it is saved and you get a confirmation email.'))};
+    if(!LIVE){finish();return}
+    var b=document.getElementById('b-submit');b.disabled=true;b.textContent='Submitting…';
+    fetch(APP_API.submit,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(app.data)})
+      .then(function(r){if(!r.ok) throw 0;finish()})
+      .catch(function(){al.textContent='Your application could not be submitted. Your answers are saved. Try again in a minute.';al.classList.add('show')})
+      .finally(function(){b.disabled=false;b.textContent='Submit application →'});
+  });
+
+  // Live site: skip sign-in when a session already exists
+  if(LIVE){
+    fetch(API.me,{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).then(function(j){if(j&&j.email){current=j.email;signedIn(j.email,j.status_label)}}).catch(function(){});
+  }
+})();
+</script>

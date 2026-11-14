@@ -1,0 +1,5 @@
+# Never serve repo internals, notes, archives or dotfiles.
+RedirectMatch 404 "/\.(git|vscode)(/|$)"
+<FilesMatch "(^\.|\.(md|zip|sql)$)">
+  Require all denied
+</FilesMatch>

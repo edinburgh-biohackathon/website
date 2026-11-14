@@ -1,0 +1,475 @@
+<title>Submit a Challenge</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: site nav, intro band, then a two-column form (section rail left, fieldset cards right). Light only, same tokens as edinburghbiohackathon.co.uk. */
+:root{
+  color-scheme:light;
+  --bg:#FFFFFF; --band:#FAFAFA; --surface:#FFFFFF; --ink:#18181B; --muted:#4B5563; --faint:#6B7280; --line:#E5E7EB;
+  --accent:#3639FD; --accent-soft:#EEF1FF; --ok:#0B7A60; --ok-bg:#E3F5EE; --err:#B42318; --err-bg:#FDECEA;
+  --purple:#7E4AA8; --purple-bg:#F6F0FC; --blue:#3639FD; --blue-bg:#EEF1FF; --teal:#2F7F82; --teal-bg:#EAF6F6;
+  --grad:linear-gradient(150deg,#7E4AA8 0%,#3F7F86 48%,#1E22B4 100%);
+  --display:'Bungee','Arial Black',Impact,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:var(--accent)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:rgba(255,255,255,.94)}
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:16px;height:56px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:15px;color:var(--ink);text-decoration:none;white-space:nowrap}
+.brand img{width:22px;height:auto}
+.back{margin-left:auto;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:6px}
+.back:hover{background:var(--band);color:var(--ink)}
+
+.intro{background:var(--band);border-bottom:1px solid var(--line)}
+.intro .wrap{padding-block:44px 40px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:40px;align-items:end}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(34px,5.6vw,58px);line-height:1;letter-spacing:.01em;margin:10px 0 14px;text-wrap:balance}
+.lede{color:var(--muted);font-size:17px;max-width:56ch}
+.facts{display:grid;gap:10px;font-size:14.5px}
+.fact{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.fact svg{flex:none;width:20px;height:20px;margin-top:2px;fill:none;stroke:var(--accent);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.fact b{display:block;font-weight:600}
+.fact span{color:var(--muted)}
+
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:40px;padding-block:40px 72px}
+.rail{position:sticky;top:88px;align-self:start;display:grid;gap:4px}
+.rail-h{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.rail a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;text-decoration:none;color:var(--muted);font-size:14.5px}
+.rail a:hover{background:var(--band);color:var(--ink)}
+.rail .dot{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-family:var(--mono);font-size:11px;color:var(--faint);background:var(--surface)}
+.rail a.done .dot{background:var(--ok);border-color:var(--ok);color:#FFFFFF}
+.rail a.done .dot::after{content:"";width:9px;height:5px;border-left:2px solid #FFFFFF;border-bottom:2px solid #FFFFFF;transform:rotate(-45deg) translate(1px,-1px)}
+.rail a.done .dot span{display:none}
+.rail .meter{margin-top:14px;height:6px;border-radius:999px;background:var(--line);overflow:hidden}
+.rail .meter i{display:block;height:100%;width:0;background:var(--grad);transition:width .3s}
+.rail .meter-t{font-family:var(--mono);font-size:12px;color:var(--faint);margin-top:6px}
+
+form{display:grid;gap:24px;min-width:0}
+fieldset{border:1px solid var(--line);border-radius:14px;padding:26px 26px 28px;margin:0;display:grid;gap:22px;min-width:0;background:var(--surface)}
+legend{display:contents}
+.fs-head{display:flex;gap:14px;align-items:baseline}
+.fs-num{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600;letter-spacing:.08em}
+.fs-title{font-size:21px;font-weight:600;line-height:1.3}
+.fs-sub{color:var(--muted);font-size:14.5px;margin-top:-14px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 20px}
+.field{display:grid;gap:7px;min-width:0}
+.field.full{grid-column:1/-1}
+label.lab,.lab{font-weight:600;font-size:15px}
+.req{color:var(--err);margin-left:2px}
+.hint{color:var(--faint);font-size:13.5px;line-height:1.5}
+input[type=text],input[type=email],textarea,select{width:100%;font:inherit;font-size:15.5px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:8px;padding:11px 13px;transition:border-color .15s,box-shadow .15s}
+textarea{min-height:140px;resize:vertical;line-height:1.55}
+input:hover,textarea:hover,select:hover{border-color:#C9CDD3}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.field.invalid input,.field.invalid textarea,.field.invalid select{border-color:var(--err)}
+.err{display:none;color:var(--err);font-size:13.5px}
+.field.invalid .err,.group.invalid .err{display:block}
+.count{font-family:var(--mono);font-size:12px;color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
+.count.over{color:var(--err)}
+
+/* Choice controls */
+.group{display:grid;gap:10px;min-width:0}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill input,.track input,.seg input,.chip input{position:absolute;opacity:0;pointer-events:none}
+.pill span{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1.5px solid var(--line);border-radius:999px;font-size:14.5px;cursor:pointer;background:var(--surface);transition:all .15s}
+.pill span:hover{border-color:#C9CDD3}
+.pill input:checked+span{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
+.pill input:focus-visible+span,.track input:focus-visible+.track-c,.seg input:focus-visible+span,.chip input:focus-visible+span{outline:2.5px solid var(--accent);outline-offset:2px}
+.pill,.track,.seg,.chip{position:relative}
+
+.tracks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.track-c{display:grid;gap:8px;height:100%;padding:16px;border:1.5px solid var(--line);border-top:4px solid var(--tc);border-radius:10px;cursor:pointer;background:var(--surface);transition:all .15s}
+.track-c:hover{background:var(--tb)}
+.track input:checked+.track-c{background:var(--tb);border-color:var(--tc);box-shadow:0 0 0 1px var(--tc) inset}
+.track-top{display:flex;align-items:center;justify-content:space-between}
+.track-ico{width:38px;height:38px;border-radius:50%;background:var(--tb);display:grid;place-items:center}
+.track input:checked+.track-c .track-ico{background:#FFFFFF}
+.track-ico svg{width:20px;height:20px;fill:none;stroke:var(--tc);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.radio-dot{width:18px;height:18px;border-radius:50%;border:1.5px solid #C9CDD3;background:#FFFFFF}
+.track input:checked+.track-c .radio-dot{border:5px solid var(--tc)}
+.track-n{font-weight:600;color:var(--tc);line-height:1.3}
+.track-d{font-size:13.5px;color:var(--muted);line-height:1.5}
+.t-ac{--tc:var(--purple);--tb:var(--purple-bg)}.t-in{--tc:var(--blue);--tb:var(--blue-bg)}.t-nc{--tc:var(--teal);--tb:var(--teal-bg)}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip span{display:inline-flex;align-items:center;gap:8px;padding:8px 13px 8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:14.5px;cursor:pointer;background:var(--surface);transition:all .15s}
+.chip span::before{content:"";width:16px;height:16px;border-radius:4px;border:1.5px solid #C9CDD3;background:#FFFFFF;flex:none}
+.chip input:checked+span{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+.chip input:checked+span::before{background:var(--accent);border-color:var(--accent);box-shadow:inset 0 0 0 3px var(--accent-soft)}
+
+.segs{display:grid;gap:8px}
+.seg span{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer;font-size:15px;background:var(--surface);transition:all .15s}
+.seg span::before{content:"";flex:none;width:18px;height:18px;border-radius:50%;border:1.5px solid #C9CDD3;background:#FFFFFF}
+.seg input:checked+span{border-color:var(--accent);background:var(--accent-soft)}
+.seg input:checked+span::before{border:5px solid var(--accent)}
+.seg small{color:var(--faint);font-size:13px;margin-left:auto;text-align:right}
+
+.quote{padding:14px 16px;border-left:3px solid var(--accent);background:var(--band);border-radius:0 8px 8px 0;font-style:italic;color:var(--ink)}
+.confirm{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border:1.5px solid var(--line);border-radius:10px;background:var(--band);cursor:pointer}
+.confirm input{flex:none;width:20px;height:20px;margin-top:3px;accent-color:var(--ok)}
+.confirm q{font-style:italic}
+.group.invalid .confirm{border-color:var(--err)}
+
+.submit-row{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center;justify-content:space-between;padding:22px 26px;border-radius:14px;background:var(--grad);color:#FFFFFF}
+.submit-row p{font-size:14.5px;opacity:.92;max-width:52ch}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:600;font-size:15.5px;padding:12px 22px;border-radius:8px;border:1.5px solid var(--ink);color:var(--ink);background:transparent;cursor:pointer;text-decoration:none;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:3px 3px 0 var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+.btn.white{background:#FFFFFF;border-color:#FFFFFF;color:var(--accent)}
+.btn.white:hover{box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+.btn[disabled]{opacity:.6;cursor:progress;transform:none;box-shadow:none}
+.draft{font-family:var(--mono);font-size:12px;color:var(--faint);margin-top:-8px}
+.alert{display:none;gap:10px;padding:14px 16px;border-radius:10px;background:var(--err-bg);color:var(--err);font-size:14.5px}
+.alert.show{display:flex}
+
+/* Done view */
+.done{padding-block:56px 80px;max-width:760px}
+.done-badge{width:56px;height:56px;border-radius:50%;background:var(--ok-bg);display:grid;place-items:center;margin-bottom:18px}
+.done-badge svg{width:28px;height:28px;fill:none;stroke:var(--ok);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.done h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,40px);line-height:1.05;margin-bottom:12px}
+.done .lede{margin-bottom:26px}
+.summary{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:26px}
+.summary div{display:grid;grid-template-columns:170px minmax(0,1fr);gap:14px;padding:12px 16px;border-top:1px solid var(--line);font-size:15px}
+.summary div:first-child{border-top:0}
+.summary dt{color:var(--faint);font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding-top:3px}
+.summary dd{margin:0;overflow-wrap:anywhere}
+.preview-note{display:inline-flex;gap:8px;align-items:center;font-family:var(--mono);font-size:12px;padding:6px 10px;border-radius:6px;background:#FDF4E3;color:#8A5A12;margin-bottom:18px}
+.next{display:grid;gap:10px;margin-bottom:28px;padding-left:0;list-style:none}
+.next li{display:flex;gap:12px;align-items:flex-start}
+.next li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:9px}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.mail{font-family:var(--mono);font-size:14px;user-select:all}
+
+footer{border-top:1px solid var(--line);background:var(--band)}
+footer .wrap{padding-block:22px;display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;font-size:13.5px;color:var(--faint)}
+
+@media (max-width:900px){
+  .intro .wrap{grid-template-columns:1fr;gap:24px}
+  .layout{grid-template-columns:1fr;gap:20px;padding-top:24px}
+  .rail{position:static;grid-auto-flow:column;grid-auto-columns:max-content;overflow-x:auto;gap:6px;scrollbar-width:none}
+  .rail::-webkit-scrollbar{display:none}
+  .rail-h,.rail .meter,.rail .meter-t{display:none}
+  .rail a{border:1px solid var(--line);font-size:13.5px;padding:7px 10px}
+}
+@media (max-width:640px){
+  fieldset{padding:20px 16px 22px}
+  .grid2,.tracks{grid-template-columns:1fr}
+  .summary div{grid-template-columns:1fr;gap:2px}
+  .submit-row{padding:20px 18px}
+  .submit-row .btn{width:100%}
+  .seg span{flex-wrap:wrap}
+  .seg small{margin-left:30px;text-align:left;width:100%}
+}
+</style>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="https://edinburghbiohackathon.bio.ed.ac.uk/"><img src="img/mark-blue.png" alt="">Edinburgh BioHackathon</a>
+    <a class="back" href="https://edinburghbiohackathon.bio.ed.ac.uk/#sponsor">← Back to site</a>
+  </div>
+</header>
+
+<main id="form-view">
+  <section class="intro">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Challenge providers · 2027</span>
+        <h1>Submit a challenge</h1>
+        <p class="lede">Thank you for your interest in contributing a challenge to Edinburgh BioHackathon 2027. Challenges should be solvable within 2–3 days by a team of 3–6 participants (students and researchers from mixed backgrounds).</p>
+      </div>
+      <div class="facts">
+        <div class="fact"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0"/><path d="M4 4l16 16"/></svg><div><b>Non-confidential only</b><span>All challenges must be non-confidential, and any data provided must also be fully non-confidential and shareable with participants.</span></div></div>
+        <div class="fact"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div><b>About 10 minutes</b><span>Your answers are kept on this device as you type, so you can come back to finish.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap layout">
+    <nav class="rail" aria-label="Form sections">
+      <span class="rail-h">Sections</span>
+      <a href="#s-you" data-sec="s-you"><span class="dot"><span>1</span></span>About you</a>
+      <a href="#s-confirm" data-sec="s-confirm"><span class="dot"><span>2</span></span>Consent &amp; submission</a>
+      <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+      <div class="meter-t" id="meter-t">0 of 2 sections complete</div>
+    </nav>
+
+    <form id="cform" novalidate>
+      <fieldset id="s-you">
+        <legend><div class="fs-head"><span class="fs-num">01</span><span class="fs-title">About you</span></div></legend>
+        <div class="grid2">
+          <div class="field"><label class="lab" for="name">Your name<span class="req">*</span></label><input type="text" id="name" name="name" autocomplete="name" required><span class="err">Enter your name.</span></div>
+          <div class="field"><label class="lab" for="org">Organisation / Affiliation<span class="req">*</span></label><input type="text" id="org" name="organisation" autocomplete="organization" required><span class="err">Enter your organisation or affiliation.</span></div>
+          <div class="field"><label class="lab" for="email">Email address<span class="req">*</span></label><input type="email" id="email" name="email" autocomplete="email" required><span class="err">Enter a valid email address, like name@example.com.</span></div>
+          <div class="field"><label class="lab" for="role">Your role / title</label><input type="text" id="role" name="role" autocomplete="organization-title"></div>
+        </div>
+        <div class="group" data-group="submitter_type">
+          <span class="lab" id="lab-type">Are you submitting as:<span class="req">*</span></span>
+          <div class="pills" role="radiogroup" aria-labelledby="lab-type">
+            <label class="pill"><input type="radio" name="submitter_type" id="st-ac" value="Academic"><span>Academic</span></label>
+            <label class="pill"><input type="radio" name="submitter_type" id="st-in" value="Industry / Company"><span>Industry / Company</span></label>
+            <label class="pill"><input type="radio" name="submitter_type" id="st-ps" value="Public Sector"><span>Public Sector</span></label>
+            <label class="pill"><input type="radio" name="submitter_type" id="st-sme" value="SME / Startup"><span>SME / Startup</span></label>
+            <label class="pill"><input type="radio" name="submitter_type" id="st-ir" value="Independent Researcher"><span>Independent Researcher</span></label>
+          </div>
+          <span class="err">Choose one option.</span>
+        </div>
+
+        <div class="field"><label class="lab" for="title">Challenge title<span class="req">*</span></label><input type="text" id="title" name="challenge_title" maxlength="160" required><span class="err">Give your challenge a title.</span></div>
+
+        <div class="group" data-group="track">
+          <span class="lab" id="lab-track">Which track does this challenge best fit?</span>
+          <div class="tracks" role="radiogroup" aria-labelledby="lab-track">
+            <label class="track t-ac"><input type="radio" name="track" id="tr-ac" value="Academic Research"><span class="track-c"><span class="track-top"><span class="track-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/><path d="M7.5 15h9"/></svg></span><span class="radio-dot"></span></span><span class="track-n">Academic Research</span><span class="track-d">Open research problems from labs, often with real datasets.</span></span></label>
+            <label class="track t-in"><input type="radio" name="track" id="tr-in" value="Industrial Innovation"><span class="track-c"><span class="track-top"><span class="track-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V8l5 3V8l5 3V4h6v17z"/><path d="M8 17h2M14 17h2"/></svg></span><span class="radio-dot"></span></span><span class="track-n">Industrial Innovation</span><span class="track-d">Practical problems from companies, aimed at a working prototype.</span></span></label>
+            <label class="track t-nc"><input type="radio" name="track" id="tr-nc" value="Non-Coding Problem-Solving"><span class="track-c"><span class="track-top"><span class="track-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h12v8H9l-4 3v-3H4z"/><path d="M16 9h4v8h-1v3l-4-3h-4v-2"/></svg></span><span class="radio-dot"></span></span><span class="track-n">Non-Coding Problem&#8209;Solving</span><span class="track-d">Design, strategy and business problems that need no code.</span></span></label>
+          </div>
+        </div>
+
+        <div class="group" data-group="backgrounds">
+          <span class="lab" id="lab-bg">What background would your ideal team have?</span>
+          <span class="hint">Select all that apply.</span>
+          <div class="chips" role="group" aria-labelledby="lab-bg">
+            <label class="chip"><input type="checkbox" name="backgrounds" id="bg-bio" value="Biology / Life Sciences"><span>Biology / Life Sciences</span></label>
+            <label class="chip"><input type="checkbox" name="backgrounds" id="bg-comp" value="Computational / Data Science"><span>Computational / Data Science</span></label>
+            <label class="chip"><input type="checkbox" name="backgrounds" id="bg-ml" value="Machine Learning / AI"><span>Machine Learning / AI</span></label>
+            <label class="chip"><input type="checkbox" name="backgrounds" id="bg-eng" value="Engineering / Synthetic Biology"><span>Engineering / Synthetic Biology</span></label>
+            <label class="chip"><input type="checkbox" name="backgrounds" id="bg-des" value="Design / Communication"><span>Design / Communication</span></label>
+            <label class="chip"><input type="checkbox" name="backgrounds" id="bg-biz" value="Business / Entrepreneurship"><span>Business / Entrepreneurship</span></label>
+            <label class="chip"><input type="checkbox" name="backgrounds" id="bg-chem" value="Drug Design / Medicinal Chemistry"><span>Drug Design / Medicinal Chemistry</span></label>
+          </div>
+        </div>
+
+        <div class="field"><label class="lab" for="desc">Challenge description<span class="req">*</span></label><span class="hint">Problem background, context, key questions.</span><textarea id="desc" name="description" data-max="4000" required></textarea><span class="count" data-for="desc"></span><span class="err">Describe your challenge.</span></div>
+        <div class="field"><label class="lab" for="outcome">What is the expected outcome that a team could realistically deliver in 2–3 days?<span class="req">*</span></label><span class="hint">Examples: exploratory model, prototype script, visualisation, conceptual pipeline, design proposal, sonification output, etc.</span><textarea id="outcome" name="expected_outcome" data-max="2000" required></textarea><span class="count" data-for="outcome"></span><span class="err">Describe the expected outcome.</span></div>
+        <div class="field"><label class="lab" for="resources">What tools, data, or resources will you provide?<span class="req">*</span></label><span class="hint">Reminder: all data and challenges provided will be non-confidential and shared with the participants.</span><textarea id="resources" name="resources" data-max="2000" required></textarea><span class="count" data-for="resources"></span><span class="err">List what you'll provide.</span></div>
+
+        <div class="group" data-group="mentoring">
+          <span class="lab" id="lab-men">Are you (or your team) willing to mentor participants during the hackathon?<span class="req">*</span></span>
+          <div class="segs" role="radiogroup" aria-labelledby="lab-men">
+            <label class="seg"><input type="radio" name="mentoring" id="m-full" value="Yes – during challenge introduction + office hours"><span>Yes – during challenge introduction + office hours</span></label>
+            <label class="seg"><input type="radio" name="mentoring" id="m-lim" value="Yes – limited availability"><span>Yes – limited availability</span></label>
+            <label class="seg"><input type="radio" name="mentoring" id="m-no" value="No"><span>No</span></label>
+            <label class="seg"><input type="radio" name="mentoring" id="m-ns" value="Not sure yet"><span>Not sure yet</span></label>
+          </div>
+          <span class="err">Choose one option.</span>
+        </div>
+        <div class="group" data-group="judging">
+          <span class="lab" id="lab-jud">Would you like to join the judging panel?<span class="req">*</span></span>
+          <div class="pills" role="radiogroup" aria-labelledby="lab-jud">
+            <label class="pill"><input type="radio" name="judging" id="j-yes" value="Yes"><span>Yes</span></label>
+            <label class="pill"><input type="radio" name="judging" id="j-no" value="No"><span>No</span></label>
+            <label class="pill"><input type="radio" name="judging" id="j-maybe" value="Maybe"><span>Maybe</span></label>
+          </div>
+          <span class="err">Choose one option.</span>
+        </div>
+      </fieldset>
+
+      <fieldset id="s-confirm">
+        <legend><div class="fs-head"><span class="fs-num">02</span><span class="fs-title">Consent &amp; submission</span></div></legend>
+        <div class="group" data-group="nonconfidential">
+          <span class="lab" id="lab-nc">Please confirm the following:<span class="req">*</span></span>
+          <p class="quote"><q>I confirm that my submitted challenge and all associated data will be non-confidential and appropriate for open student use during BioHackathon Edinburgh.</q></p>
+          <div class="segs" role="radiogroup" aria-labelledby="lab-nc">
+            <label class="seg"><input type="radio" name="nonconfidential" id="nc-yes" value="Fully non-confidential, shareable, and suitable for student use"><span>Fully non-confidential, shareable, and suitable for student use</span></label>
+            <label class="seg"><input type="radio" name="nonconfidential" id="nc-ns" value="I’m not sure (we will contact you)"><span>I’m not sure (we will contact you)</span></label>
+          </div>
+          <span class="err">Choose one option.</span>
+        </div>
+        <div class="field"><label class="lab" for="notes">Any other notes or requirements?</label><textarea id="notes" name="notes" data-max="1500" style="min-height:100px"></textarea><span class="count" data-for="notes"></span></div>
+      </fieldset>
+
+      <div class="alert" id="alert" role="alert"></div>
+      <div class="submit-row">
+        <p>We'll review your challenge and reply by email. Questions? Contact biohackathon@ed.ac.uk.</p>
+        <button class="btn white" type="submit" id="submit">Submit challenge →</button>
+      </div>
+      <p class="draft" id="draft" aria-live="polite"></p>
+    </form>
+  </div>
+</main>
+
+<main id="done-view" class="wrap" hidden>
+  <div class="done">
+    <div class="done-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <span class="preview-note" id="preview-note" hidden>Preview · nothing was sent</span>
+    <h2>Challenge received</h2>
+    <p class="lede" id="done-lede">Thank you. A copy of your answers is below.</p>
+    <dl class="summary" id="summary"></dl>
+    <span class="lab">What happens next</span>
+    <ul class="next">
+      <li>The organising committee reviews every challenge for fit with the three tracks. If you weren't sure about confidentiality, we'll contact you first.</li>
+      <li>We may contact you to refine the scope, data or expected outcome.</li>
+      <li>Selected challenges are announced to participants before the event, with your organisation credited.</li>
+    </ul>
+    <div class="actions">
+      <a class="btn primary" href="https://edinburghbiohackathon.bio.ed.ac.uk/#sponsor">See sponsorship tiers</a>
+      <button class="btn" type="button" id="another">Submit another challenge</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap"><span>Edinburgh BioHackathon · University of Edinburgh</span><span>biohackathon@ed.ac.uk</span></div>
+</footer>
+
+<script>
+(function(){
+  // Where submissions go once this page is on the real site. Anywhere else it runs as a preview and sends nothing.
+  var ENDPOINT = '/api/challenges';
+  // PAUSED 2026-11-14: challenges go through a Google Form for now; this page always runs as a preview.
+  // To re-enable: restore the regex below, re-enable the route in api/index.php, remove challenge/.htaccess.
+  // var LIVE = /(^|\.)edinburghbiohackathon\.(co\.uk|bio\.ed\.ac\.uk)$/.test(location.hostname);
+  var LIVE = false;
+  var DRAFT_KEY = 'ebh-challenge-draft-v1';
+
+  var form = document.getElementById('cform');
+  var sections = ['s-you','s-confirm'];
+  var requiredGroups = {
+    's-you':['name','org','email','@submitter_type','title','desc','outcome','resources','@mentoring','@judging'],
+    's-confirm':['@nonconfidential']
+  };
+
+  function val(id){var el=document.getElementById(id);return el?el.value.trim():''}
+  function groupVal(name){return Array.prototype.map.call(form.querySelectorAll('input[name="'+name+'"]:checked'),function(i){return i.value})}
+  function emailOk(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
+  function overLimit(id){var el=document.getElementById(id);var m=+el.getAttribute('data-max');return m&&el.value.length>m}
+
+  function checkItem(item){
+    if(item.charAt(0)==='@'){return groupVal(item.slice(1)).length>0}
+    var v=val(item);
+    if(item==='email') return emailOk(v);
+    if(document.getElementById(item).hasAttribute('data-max') && overLimit(item)) return false;
+    return v.length>0;
+  }
+  function sectionDone(s){return requiredGroups[s].every(checkItem)}
+
+  function markItem(item,ok){
+    var host = item.charAt(0)==='@' ? form.querySelector('[data-group="'+item.slice(1)+'"]') : document.getElementById(item).closest('.field');
+    if(host) host.classList.toggle('invalid',!ok);
+  }
+
+  function updateRail(){
+    var n=0;
+    sections.forEach(function(s){
+      var d=sectionDone(s); if(d) n++;
+      document.querySelector('.rail a[data-sec="'+s+'"]').classList.toggle('done',d);
+    });
+    document.getElementById('meter').style.width=(n/sections.length*100)+'%';
+    document.getElementById('meter-t').textContent=n+' of '+sections.length+' sections complete';
+  }
+
+  function updateCounts(){
+    document.querySelectorAll('.count').forEach(function(c){
+      var el=document.getElementById(c.getAttribute('data-for'));var m=+el.getAttribute('data-max');
+      c.textContent=el.value.length.toLocaleString()+' / '+m.toLocaleString();
+      c.classList.toggle('over',el.value.length>m);
+    });
+  }
+
+  // Draft on this device only
+  function collect(){
+    var d={};
+    form.querySelectorAll('input[type=text],input[type=email],textarea').forEach(function(el){d[el.name]=el.value});
+    ['submitter_type','track','mentoring','judging','nonconfidential'].forEach(function(n){d[n]=groupVal(n)[0]||''});
+    d.backgrounds=groupVal('backgrounds');
+    return d;
+  }
+  var saveT;
+  function saveDraft(){
+    clearTimeout(saveT);
+    saveT=setTimeout(function(){
+      try{localStorage.setItem(DRAFT_KEY,JSON.stringify(collect()));document.getElementById('draft').textContent='Draft saved on this device · '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}catch(e){}
+    },500);
+  }
+  function loadDraft(){
+    var d;try{d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null')}catch(e){d=null}
+    if(!d) return;
+    form.querySelectorAll('input[type=text],input[type=email],textarea').forEach(function(el){if(typeof d[el.name]==='string') el.value=d[el.name]});
+    ['submitter_type','track','mentoring','judging','nonconfidential'].forEach(function(n){if(d[n]){form.querySelectorAll('input[name="'+n+'"]').forEach(function(i){i.checked=(i.value===d[n])})}});
+    (d.backgrounds||[]).forEach(function(v){form.querySelectorAll('input[name="backgrounds"]').forEach(function(i){if(i.value===v) i.checked=true})});
+    document.getElementById('draft').textContent='Draft restored from this device';
+  }
+  function clearDraft(){try{localStorage.removeItem(DRAFT_KEY)}catch(e){}}
+
+  form.addEventListener('input',function(e){
+    updateCounts();updateRail();saveDraft();
+    var f=e.target.closest('.field,.group');
+    if(f && f.classList.contains('invalid')){
+      var id=e.target.id, name=e.target.name;
+      Object.keys(requiredGroups).forEach(function(s){requiredGroups[s].forEach(function(it){
+        if(it===id||it==='@'+name) markItem(it,checkItem(it));
+      })});
+    }
+  });
+  form.addEventListener('change',function(){updateRail();saveDraft()});
+  form.querySelectorAll('input[type=text],input[type=email],textarea').forEach(function(el){
+    el.addEventListener('blur',function(){
+      if(!el.value.trim()) return;
+      Object.keys(requiredGroups).forEach(function(s){if(requiredGroups[s].indexOf(el.id)>-1) markItem(el.id,checkItem(el.id))});
+    });
+  });
+
+  function rows(d){
+    return [
+      ['Challenge',d.challenge_title],['Track',d.track],['Ideal team',(d.backgrounds||[]).join(', ')],
+      ['Submitted by',d.name+(d.role?', '+d.role:'')+' · '+d.organisation],['Email',d.email],
+      ['Mentoring',d.mentoring],['Judging',d.judging],['Confidentiality',d.nonconfidential]
+    ];
+  }
+  function showDone(d,preview){
+    var dl=document.getElementById('summary');dl.textContent='';
+    rows(d).forEach(function(r){var w=document.createElement('div');var t=document.createElement('dt');t.textContent=r[0];var v=document.createElement('dd');v.textContent=r[1]||'—';w.appendChild(t);w.appendChild(v);dl.appendChild(w)});
+    document.getElementById('preview-note').hidden=!preview;
+    document.getElementById('done-lede').textContent=preview?'This is a preview of the confirmation page. On the live site your challenge is saved and the committee is notified.':'Thank you. We have your challenge and will reply to '+d.email+'.';
+    document.getElementById('form-view').hidden=true;
+    document.getElementById('done-view').hidden=false;
+    window.scrollTo(0,0);
+  }
+
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var alertEl=document.getElementById('alert');alertEl.classList.remove('show');
+    var first=null;
+    sections.forEach(function(s){requiredGroups[s].forEach(function(it){
+      var ok=checkItem(it);markItem(it,ok);
+      if(!ok && !first){first = it.charAt(0)==='@' ? form.querySelector('[data-group="'+it.slice(1)+'"] input') : document.getElementById(it)}
+    })});
+    updateRail();
+    if(first){
+      alertEl.textContent='Some answers are missing or need fixing. They are marked in red.';alertEl.classList.add('show');
+      first.closest('.field,.group').scrollIntoView({block:'center'});
+      setTimeout(function(){first.focus({preventScroll:true})},300);
+      return;
+    }
+    var data=collect();data.submitted_at=new Date().toISOString();
+    if(!LIVE){clearDraft();showDone(data,true);return}
+    var btn=document.getElementById('submit');btn.disabled=true;btn.textContent='Submitting…';
+    fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+      .then(function(r){if(!r.ok) throw new Error(r.status);clearDraft();showDone(data,false)})
+      .catch(function(err){
+        alertEl.textContent=String(err&&err.message)==='429'?'Too many submissions from your connection. Your answers are still here. Try again in an hour, or email them to biohackathon@ed.ac.uk.':'Your challenge could not be sent. Your answers are still here. Try again in a minute, or email them to biohackathon@ed.ac.uk.';
+        alertEl.classList.add('show');
+      })
+      .finally(function(){btn.disabled=false;btn.textContent='Submit challenge →'});
+  });
+
+  document.getElementById('another').addEventListener('click',function(){
+    form.reset();form.querySelectorAll('.invalid').forEach(function(x){x.classList.remove('invalid')});
+    updateCounts();updateRail();document.getElementById('draft').textContent='';
+    document.getElementById('done-view').hidden=true;document.getElementById('form-view').hidden=false;window.scrollTo(0,0);
+  });
+
+  loadDraft();updateCounts();updateRail();
+})();
+</script>

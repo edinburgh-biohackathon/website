@@ -1,0 +1,2 @@
+# PAUSED 2026-11-14: challenge submissions use a Google Form for now. Delete this file to bring the page back.
+RedirectMatch 302 ^/challenge(/.*)?$ https://forms.gle/bFipHvRmAPJMqDCy8

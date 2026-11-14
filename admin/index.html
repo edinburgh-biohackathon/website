@@ -1,0 +1,760 @@
+<title>BioHackathon Admin</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: committee CRM. Left sidebar of views, top bar, then the active view: Overview (counts and bars), Applicants (filters, table, detail drawer), Logistics (accepted cohort needs), Challenges. Light only, site tokens. */
+:root{
+  color-scheme:light;
+  --bg:#F7F7FA; --surface:#FFFFFF; --band:#FAFAFA; --ink:#18181B; --muted:#4B5563; --faint:#6B7280; --line:#E5E7EB; --line2:#EEF0F3;
+  --accent:#3639FD; --accent-soft:#EEF1FF;
+  --ok:#0B7A60; --ok-bg:#E3F5EE; --warn:#8A5A12; --warn-bg:#FDF4E3; --bad:#B42318; --bad-bg:#FDECEA; --info:#3639FD; --info-bg:#EEF1FF; --neutral:#55606E; --neutral-bg:#EDF0F4;
+  --purple:#7E4AA8; --purple-bg:#F6F0FC; --teal:#2F7F82; --teal-bg:#EAF6F6; --rose:#C2416B; --rose-bg:#FCEBF1;
+  --grad:linear-gradient(150deg,#7E4AA8 0%,#3F7F86 48%,#1E22B4 100%);
+  --display:'Bungee','Arial Black',Impact,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+*{box-sizing:border-box}
+h1,h2,h3,h4,p,dl,dd,ul,ol{margin:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14.5px;line-height:1.5}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+button{font:inherit;color:inherit}
+.tnum{font-variant-numeric:tabular-nums}
+
+.app{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:100%}
+.app > div{min-width:0}
+.side{background:var(--surface);border-right:1px solid var(--line);padding-block:18px;padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:14px;display:flex;flex-direction:column;gap:18px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--display);font-size:13.5px;line-height:1.15;padding:4px 6px}
+.brand img{width:24px;height:auto;flex:none}
+.brand small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--faint);font-weight:500}
+.navv{display:grid;gap:2px}
+.navv a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--muted);text-decoration:none;font-weight:500}
+.navv a svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.navv a:hover{background:var(--band);color:var(--ink)}
+.navv a.on{background:var(--accent-soft);color:var(--accent)}
+.navv .n{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+.navv a.on .n{color:var(--accent)}
+.side-foot{margin-top:auto;display:grid;gap:8px;font-size:12.5px;color:var(--faint)}
+.me{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--band)}
+.av{width:26px;height:26px;border-radius:50%;background:var(--grad);color:#FFFFFF;display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.me b{display:block;color:var(--ink);font-size:12.5px;overflow-wrap:anywhere}
+
+main{min-width:0;padding-block:20px 48px;padding-left:24px;padding-right:max(24px,env(safe-area-inset-right,0px))}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;margin-bottom:18px}
+.top h1{font-size:22px;font-weight:600;letter-spacing:-.01em}
+.top .sub{color:var(--faint);font-size:13.5px}
+.top .grow{flex:1}
+.sample{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;padding:5px 10px;border-radius:6px;background:var(--warn-bg);color:var(--warn)}
+.btn{display:inline-flex;align-items:center;gap:7px;font-weight:600;font-size:13.5px;padding:8px 13px;border-radius:7px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:#C9CDD3}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+.btn.primary:hover{background:#2427E8}
+.btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+/* Status chips */
+.st{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap;background:var(--neutral-bg);color:var(--neutral)}
+.st::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.st.s-new{background:var(--info-bg);color:var(--info)}
+.st.s-review{background:var(--purple-bg);color:var(--purple)}
+.st.s-accepted{background:var(--ok-bg);color:var(--ok)}
+.st.s-waitlist{background:var(--warn-bg);color:var(--warn)}
+.st.s-rejected{background:var(--bad-bg);color:var(--bad)}
+.st.s-confirmed{background:#0B7A60;color:#FFFFFF}
+.st.s-declined{background:var(--neutral-bg);color:var(--neutral)}
+.st.s-draft{background:transparent;border:1px dashed #C9CDD3;color:var(--faint)}
+.tag{display:inline-block;font-size:11.5px;padding:2px 7px;border-radius:5px;background:var(--neutral-bg);color:var(--neutral);white-space:nowrap}
+.tag.t-ac{background:var(--purple-bg);color:var(--purple)}.tag.t-in{background:var(--info-bg);color:var(--info)}.tag.t-nc{background:var(--teal-bg);color:var(--teal)}
+
+/* Overview */
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.kpi .l{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.kpi .v{font-size:28px;font-weight:600;letter-spacing:-.02em;line-height:1.2;margin-top:4px}
+.kpi .d{font-size:12.5px;color:var(--faint)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;min-width:0}
+.panel h3{font-size:14.5px;font-weight:600;margin-bottom:12px;display:flex;justify-content:space-between;gap:10px}
+.panel h3 span{font-weight:400;color:var(--faint);font-size:12.5px}
+.bars{display:grid;gap:9px}
+.bar{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) 44px;gap:10px;align-items:center;font-size:13px}
+.bar .bl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.bar .bt{height:10px;border-radius:999px;background:var(--line2);overflow:hidden}
+.bar .bt i{display:block;height:100%;border-radius:999px;background:var(--c,var(--accent))}
+.bar .bv{text-align:right;font-family:var(--mono);font-size:12px;color:var(--ink)}
+.bar.click{cursor:pointer}.bar.click:hover .bl{color:var(--accent)}
+.funnel{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.fs{border-radius:10px;padding:12px;background:var(--band);border:1px solid var(--line2);cursor:pointer;text-align:left}
+.fs:hover{border-color:#C9CDD3}
+.fs .v{font-size:22px;font-weight:600}
+.fs .l{font-size:12px;color:var(--faint);margin-top:2px}
+.target{display:grid;gap:8px}
+.tgt-bar{height:14px;border-radius:999px;background:var(--line2);overflow:hidden;display:flex}
+.tgt-bar i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+/* Applicants */
+.views{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.views button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer;color:var(--muted)}
+.views button .c{font-family:var(--mono);font-size:11.5px;margin-left:6px;color:var(--faint)}
+.views button.on{background:var(--ink);border-color:var(--ink);color:#FFFFFF}
+.views button.on .c{color:#C9CDD3}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px 12px 0 0;padding:10px 12px}
+.search{position:relative;flex:1 1 220px;min-width:0}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;fill:none;stroke:var(--faint);stroke-width:1.8;stroke-linecap:round}
+.search input{width:100%;font:inherit;font-size:14px;border:1.5px solid var(--line);border-radius:7px;padding:7px 10px 7px 32px;background:var(--surface);color:var(--ink)}
+.search input:focus,.toolbar select:focus,.fbox select:focus,.fbox input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.toolbar select{font:inherit;font-size:13.5px;border:1.5px solid var(--line);border-radius:7px;padding:7px 8px;background:var(--surface);color:var(--ink);max-width:100%}
+.filters{display:none;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 14px;background:var(--band);border:1px solid var(--line);border-top:0;padding:12px}
+.filters.open{display:grid}
+.fbox{display:grid;gap:4px;min-width:0}
+.fbox label{font-size:11.5px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.fbox select,.fbox input{font:inherit;font-size:13.5px;border:1.5px solid var(--line);border-radius:7px;padding:6px 8px;background:var(--surface);color:var(--ink);width:100%}
+.chipsbar{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;background:var(--surface);border:1px solid var(--line);border-top:0}
+.chipsbar:empty{display:none}
+.fchip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:3px 4px 3px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent);border:0;cursor:pointer}
+.fchip b{font-weight:600}
+.fchip span{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:13px}
+.fchip:hover span{background:#FFFFFF}
+.bulk{display:none;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 12px;background:var(--ink);color:#FFFFFF;font-size:13.5px}
+.bulk.show{display:flex}
+.bulk select{font:inherit;font-size:13px;border-radius:6px;border:0;padding:5px 8px}
+.bulk .btn{padding:5px 10px;font-size:12.5px}
+.tablewrap{background:var(--surface);border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th{position:sticky;top:0;background:var(--band);text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-weight:500;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th.sort{cursor:pointer;user-select:none}
+th.sort:hover{color:var(--ink)}
+th .ar{display:inline-block;width:10px}
+td{padding:10px;border-bottom:1px solid var(--line2);vertical-align:middle}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:#FAFAFF}
+tbody tr.sel{background:var(--accent-soft)}
+td.cb,th.cb{width:36px;padding-right:0}
+td.cb input,th.cb input{width:16px;height:16px;accent-color:var(--accent)}
+.nm{min-width:190px}
+.nm b{display:block;font-weight:600;white-space:nowrap}
+.nm span{font-size:12.5px;color:var(--faint)}
+.score{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:13px}
+.dots{display:inline-flex;gap:2px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--line)}
+.dots i.f{background:var(--accent)}
+.muted{color:var(--faint)}
+.empty{padding:40px 20px;text-align:center;color:var(--faint)}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 2px;color:var(--faint);font-size:12.5px}
+
+/* Drawer */
+.scrim{position:fixed;inset:0;background:rgba(24,24,27,.28);z-index:20;opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(640px,100%);background:var(--surface);z-index:21;box-shadow:-12px 0 32px rgba(24,24,27,.12);transform:translateX(102%);transition:transform .25s ease;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
+.drawer.on{transform:none}
+.dh{padding:16px 20px;border-bottom:1px solid var(--line);display:grid;gap:10px}
+.dh-top{display:flex;align-items:flex-start;gap:12px}
+.dh h2{font-size:20px;font-weight:600;line-height:1.25}
+.dh .meta{font-size:13px;color:var(--faint)}
+.x{margin-left:auto;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:grid;place-items:center;flex:none}
+.x svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.dh-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dh-actions select{font:inherit;font-size:13.5px;border:1.5px solid var(--line);border-radius:7px;padding:6px 8px;background:var(--surface);font-weight:600}
+.navbtns{margin-left:auto;display:flex;gap:4px}
+.db{flex:1;overflow-y:auto;padding:18px 20px 28px;display:grid;gap:18px;align-content:start}
+.sec{display:grid;gap:10px}
+.sec h4{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:500}
+.kv{display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 14px;font-size:14px}
+.kv dt{color:var(--faint)}
+.kv dd{margin:0;overflow-wrap:anywhere}
+.ans{display:grid;gap:4px}
+.ans b{font-size:13px;color:var(--muted);font-weight:600}
+.ans p{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--band);border:1px solid var(--line2);border-radius:8px;padding:10px 12px;font-size:14px}
+.cv{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
+.cv .fi{width:34px;height:42px;border-radius:5px;background:var(--bad-bg);color:var(--bad);display:grid;place-items:center;font-family:var(--mono);font-size:10px;font-weight:700;flex:none}
+.cv div{min-width:0;flex:1}
+.cv b{display:block;overflow-wrap:anywhere;font-size:13.5px}
+.cv span{font-size:12.5px;color:var(--faint)}
+.review{border:1.5px solid var(--accent);border-radius:12px;padding:14px;display:grid;gap:12px;background:#FCFCFF}
+.review h4{color:var(--accent)}
+.rrow{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.rrow .rl{font-size:13px;font-weight:600;min-width:110px}
+.stars{display:flex;gap:4px}
+.stars button{width:32px;height:32px;border-radius:7px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;font-family:var(--mono);font-weight:600}
+.stars button.on{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:6px 12px;cursor:pointer;font-size:13px;font-weight:500;border-left:1px solid var(--line)}
+.seg button:first-child{border-left:0}
+.seg button.on.v-accept{background:var(--ok);color:#FFFFFF}
+.seg button.on.v-maybe{background:#B7791F;color:#FFFFFF}
+.seg button.on.v-reject{background:var(--bad);color:#FFFFFF}
+.seg button.on.cat{background:var(--ink);color:#FFFFFF}
+.review textarea{width:100%;font:inherit;font-size:14px;border:1.5px solid var(--line);border-radius:8px;padding:9px 11px;min-height:70px;resize:vertical}
+.review textarea:focus{outline:none;border-color:var(--accent)}
+.others{display:grid;gap:8px}
+.oth{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;padding:10px 12px;border:1px solid var(--line2);border-radius:10px;font-size:13.5px}
+.oth p{color:var(--muted);margin-top:2px}
+.vote{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap;display:inline-block}
+.vote.accept{background:var(--ok-bg);color:var(--ok)}.vote.maybe{background:var(--warn-bg);color:var(--warn)}.vote.reject{background:var(--bad-bg);color:var(--bad)}
+.log{display:grid;gap:6px;font-size:13px;color:var(--muted)}
+.log div{display:flex;gap:10px}
+.log time{font-family:var(--mono);font-size:11.5px;color:var(--faint);white-space:nowrap;padding-top:1px}
+.tagsed{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tagsed .tag{display:inline-flex;align-items:center;gap:4px}
+.tagsed .tag button{border:0;background:none;cursor:pointer;padding:0 2px;color:inherit}
+.tagsed input{font:inherit;font-size:13px;border:1px dashed #C9CDD3;border-radius:6px;padding:3px 8px;width:180px}
+.copy{border:0;background:none;color:var(--accent);cursor:pointer;font-size:12.5px;text-decoration:underline;text-underline-offset:2px;padding:0 0 0 6px}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:#FFFFFF;padding:10px 16px;border-radius:8px;font-size:13.5px;opacity:0;pointer-events:none;transition:all .2s;z-index:40;max-width:calc(100% - 32px)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* Logistics + challenges */
+.list{display:grid;gap:8px}
+.li{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line2);border-radius:10px;font-size:13.5px}
+.li b{display:block}
+.li p{color:var(--muted)}
+.li .r{margin-left:auto;text-align:right;white-space:nowrap}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ch{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--tc,var(--line));border-radius:12px;padding:14px 16px;display:grid;gap:8px;cursor:pointer;text-align:left}
+.ch:hover{border-color:#C9CDD3;border-top-color:var(--tc)}
+.ch .h{display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
+.ch b{font-size:15px;line-height:1.35}
+.ch .who{font-size:13px;color:var(--faint)}
+.ch p{font-size:13.5px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ch .tags{display:flex;flex-wrap:wrap;gap:5px}
+
+.mobilebar{display:none}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.filters{grid-template-columns:repeat(3,minmax(0,1fr))}.funnel{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  .mobilebar{display:flex;position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line);padding-block:8px;padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));gap:6px;overflow-x:auto;scrollbar-width:none}
+  .mobilebar a{flex:none;padding:7px 12px;border-radius:999px;border:1px solid var(--line);text-decoration:none;color:var(--muted);font-size:13px;font-weight:500}
+  .mobilebar a.on{background:var(--ink);border-color:var(--ink);color:#FFFFFF}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:11;background:var(--surface)}
+  main{padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px))}
+  .grid,.cards{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .filters{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kv{grid-template-columns:1fr;gap:0 0}
+  .kv dd{margin-bottom:8px}
+  .bar{grid-template-columns:minmax(0,110px) minmax(0,1fr) 40px}
+}
+</style>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand"><img src="img/mark-blue.png" alt=""><div>Edinburgh BioHackathon<small>COMMITTEE ADMIN</small></div></div>
+    <nav class="navv" aria-label="Admin sections">
+      <a href="#overview" data-v="overview"><svg viewBox="0 0 24 24"><path d="M4 13h6V4H4zM14 20h6v-9h-6zM4 20h6v-3H4zM14 7h6V4h-6z"/></svg>Overview</a>
+      <a href="#applicants" data-v="applicants"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 20a6.5 6.5 0 0 0-3-5.5"/></svg>Applicants<span class="n" id="n-app"></span></a>
+      <a href="#logistics" data-v="logistics"><svg viewBox="0 0 24 24"><path d="M3 7h11v10H3zM14 10h4l3 3v4h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>Logistics</a>
+      <a href="#challenges" data-v="challenges"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/></svg>Challenges<span class="n" id="n-ch"></span></a>
+    </nav>
+    <div class="side-foot">
+      <div class="me"><span class="av" id="me-av">IY</span><div>Reviewing as<b id="me-name">ian.yang@ed.ac.uk</b></div></div>
+      <span>Edinburgh BioHackathon 2027</span>
+    </div>
+  </aside>
+
+  <div>
+    <nav class="mobilebar" aria-label="Admin sections">
+      <a href="#overview" data-v="overview">Overview</a><a href="#applicants" data-v="applicants">Applicants</a><a href="#logistics" data-v="logistics">Logistics</a><a href="#challenges" data-v="challenges">Challenges</a>
+    </nav>
+    <main>
+      <!-- OVERVIEW -->
+      <section data-view="overview">
+        <div class="top"><div><h1>Overview</h1><div class="sub">Applications for the 2027 edition</div></div><span class="grow"></span><span class="sample" data-sample hidden>Sample data · preview</span></div>
+        <div class="kpis" id="kpis"></div>
+        <div class="panel" style="margin-bottom:12px">
+          <h3>Pipeline <span>Click a stage to see those applicants</span></h3>
+          <div class="funnel" id="funnel"></div>
+        </div>
+        <div class="panel" style="margin-bottom:12px">
+          <h3>Cohort balance <span id="tgt-label"></span></h3>
+          <div class="target">
+            <div class="tgt-bar" id="tgt-bar" role="img"></div>
+            <div class="legend" id="tgt-legend"></div>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="panel"><h3>Level / role <span>submitted applications</span></h3><div class="bars" id="b-level"></div></div>
+          <div class="panel"><h3>Discipline category <span>set by reviewers</span></h3><div class="bars" id="b-cat"></div></div>
+          <div class="panel"><h3>Track interest <span>applicants can pick several</span></h3><div class="bars" id="b-track"></div></div>
+          <div class="panel"><h3>Where they come from</h3><div class="bars" id="b-where"></div></div>
+        </div>
+      </section>
+
+      <!-- APPLICANTS -->
+      <section data-view="applicants" hidden>
+        <div class="top"><div><h1>Applicants</h1><div class="sub" id="app-sub"></div></div><span class="grow"></span><span class="sample" data-sample hidden>Sample data · preview</span>
+          <button class="btn" type="button" id="b-export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Export CSV</button></div>
+        <div class="views" id="views"></div>
+        <div class="toolbar">
+          <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><input type="search" id="q" placeholder="Search name, email, institution, skills…" aria-label="Search applicants"></label>
+          <select id="f-status" aria-label="Status"></select>
+          <select id="sort" aria-label="Sort">
+            <option value="submitted:desc">Newest first</option><option value="submitted:asc">Oldest first</option>
+            <option value="score:desc">Highest score</option><option value="score:asc">Lowest score</option>
+            <option value="name:asc">Name A–Z</option>
+          </select>
+          <button class="btn" type="button" id="b-filters" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>More filters</button>
+        </div>
+        <div class="filters" id="filters"></div>
+        <div class="chipsbar" id="chips"></div>
+        <div class="bulk" id="bulk"><span id="bulk-n"></span><label for="bulk-st" style="opacity:.8">Set status</label><select id="bulk-st"></select><button class="btn" type="button" id="bulk-apply">Apply</button><button class="btn" type="button" id="bulk-copy">Copy emails</button><button class="btn" type="button" id="bulk-clear">Clear</button></div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr>
+              <th class="cb"><input type="checkbox" id="all" aria-label="Select all shown"></th>
+              <th class="sort" data-sort="name">Applicant <span class="ar"></span></th>
+              <th>Level</th><th>Field</th><th>Tracks</th><th>Category</th>
+              <th class="sort" data-sort="score">Score <span class="ar"></span></th>
+              <th>Votes</th><th>Status</th>
+              <th class="sort" data-sort="submitted">Submitted <span class="ar"></span></th>
+            </tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+          <div class="empty" id="empty" hidden>No applicants match these filters.</div>
+        </div>
+        <div class="foot"><span id="shown"></span><span>Click a row to review. Changes save automatically.</span></div>
+      </section>
+
+      <!-- LOGISTICS -->
+      <section data-view="logistics" hidden>
+        <div class="top"><div><h1>Logistics</h1><div class="sub">Needs of the people coming</div></div><span class="grow"></span>
+          <select id="lg-scope" class="btn" aria-label="Who to include"><option value="confirmed">Confirmed only</option><option value="accepted">Accepted + confirmed</option><option value="all">All submitted</option></select>
+          <span class="sample" data-sample hidden>Sample data · preview</span></div>
+        <div class="kpis" id="lg-kpis"></div>
+        <div class="grid">
+          <div class="panel"><h3>Dietary requirements <span>for catering</span></h3><div class="bars" id="lg-diet"></div><div class="list" id="lg-diet-other" style="margin-top:10px"></div></div>
+          <div class="panel"><h3>T-shirt sizes <span>for the order</span></h3><div class="bars" id="lg-tee"></div></div>
+          <div class="panel"><h3>Travel support requests <span id="lg-travel-sum"></span></h3><div class="list" id="lg-travel"></div></div>
+          <div class="panel"><h3>Accessibility and photo consent</h3><div class="list" id="lg-access"></div></div>
+        </div>
+      </section>
+
+      <!-- CHALLENGES -->
+      <section data-view="challenges" hidden>
+        <div class="top"><div><h1>Challenges</h1><div class="sub">Submitted through the challenge form</div></div><span class="grow"></span><span class="sample" data-sample hidden>Sample data · preview</span></div>
+        <div class="views" id="ch-views"></div>
+        <div class="cards" id="ch-cards"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Applicant details" aria-hidden="true">
+  <div class="dh">
+    <div class="dh-top"><div style="min-width:0"><h2 id="d-name"></h2><div class="meta" id="d-meta"></div></div>
+      <button class="x" type="button" id="d-close" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="dh-actions">
+      <label for="d-status" class="muted" style="font-size:13px">Status</label><select id="d-status"></select>
+      <span id="d-avg" class="score"></span>
+      <span class="navbtns"><button class="btn" type="button" id="d-prev" aria-label="Previous applicant">↑ Prev</button><button class="btn" type="button" id="d-next" aria-label="Next applicant">Next ↓</button></span>
+    </div>
+  </div>
+  <div class="db" id="d-body"></div>
+</aside>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  // ---------- Data source ----------
+  // On the live site the admin API (behind committee login) supplies everything below; anywhere else the page uses invented sample records.
+  var LIVE=/(^|\.)edinburghbiohackathon\.co\.uk$/.test(location.hostname);
+  var API={list:'/api/admin/applications', one:function(id){return '/api/admin/applications/'+id}, review:function(id){return '/api/admin/applications/'+id+'/review'}, challenges:'/api/admin/challenges', me:'/api/admin/me', cv:function(id){return '/api/admin/applications/'+id+'/cv'}};
+  var ME={email:'ian.yang@ed.ac.uk',name:'Ian'};
+  var TARGET=100;
+
+  var STATUSES=[['new','New'],['review','In review'],['accepted','Accepted'],['waitlist','Waitlist'],['rejected','Rejected'],['confirmed','Confirmed'],['declined','Declined'],['draft','Draft']];
+  var SLABEL={};STATUSES.forEach(function(s){SLABEL[s[0]]=s[1]});
+  var CATS=['Wet-lab','Dry-lab','Computational','Non-coding'];
+  var CATC={'Wet-lab':'#7E4AA8','Dry-lab':'#2F7F82','Computational':'#3639FD','Non-coding':'#C2416B','Not set':'#C9CDD3'};
+  var LEVELS=["Undergraduate Student","Master's Student","PhD Student","Postdoctoral Researcher","Academic Staff / Faculty","Other"];
+  var TRACKS=['Academic Research Track','Industrial Innovation Track','Non-Coder Problem-Solving Track','Not sure / No preference'];
+  var DIETS=['No dietary restrictions / None','Vegetarian','Vegan','Gluten-free','Halal','Kosher','Other'];
+  var TEES=['Extra Small (XS)','Small (S)','Medium (M)','Large (L)','Extra Large (XL)',"I don't want a T-shirt"];
+
+  var apps=[], challenges=[];
+
+  // ---------- Sample data (preview only; every person is invented) ----------
+  function sample(){
+    var people=[
+      ['Amara Okafor','PhD Student','University of Edinburgh, School of Biological Sciences','Molecular biology, CRISPR screens','Edinburgh','Wet-lab'],
+      ['Liam Fraser','Master\'s Student','University of Glasgow, School of Computing Science','Computer science, deep learning','Glasgow','Computational'],
+      ['Mei Chen','Postdoctoral Researcher','University of Edinburgh, Institute of Genetics and Cancer','Single-cell genomics','Edinburgh','Dry-lab'],
+      ['Rohan Mehta','Undergraduate Student','University of St Andrews, School of Chemistry','Chemistry, cheminformatics','St Andrews','Dry-lab'],
+      ['Sofia Russo','PhD Student','University College London, Division of Biosciences','Structural biology','London','Wet-lab'],
+      ['Callum Reid','Master\'s Student','University of Edinburgh, Business School','Business, commercialisation','Edinburgh','Non-coding'],
+      ['Hana Kobayashi','PhD Student','University of Dundee, School of Life Sciences','Cell biology, microscopy','Dundee','Wet-lab'],
+      ['Tomasz Nowak','PhD Student','University of Edinburgh, School of Informatics','Machine learning, computer vision','Edinburgh','Computational'],
+      ['Grace Mensah','Undergraduate Student','University of Edinburgh, School of Biological Sciences','Biochemistry','Edinburgh','Wet-lab'],
+      ['Arjun Nair','Postdoctoral Researcher','Imperial College London, Department of Bioengineering','Synthetic biology','London','Wet-lab'],
+      ['Isla Campbell','Master\'s Student','University of Edinburgh, School of Physics and Astronomy','Physics, dynamical systems','Edinburgh','Computational'],
+      ['Yusuf Demir','PhD Student','University of Cambridge, Department of Genetics','Bioinformatics, transcriptomics','Cambridge','Dry-lab'],
+      ['Chloe Martin','Undergraduate Student','Heriot-Watt University, School of Engineering','Biomedical engineering','Edinburgh','Wet-lab'],
+      ['Daniel Kim','PhD Student','University of Edinburgh, School of Chemistry','Medicinal chemistry, docking','Edinburgh','Dry-lab'],
+      ['Ana Ferreira','Master\'s Student','University of Strathclyde, Strathclyde Business School','Product design, strategy','Glasgow','Non-coding'],
+      ['Ewan MacLeod','PhD Student','University of Aberdeen, Institute of Medical Sciences','Immunology','Aberdeen','Wet-lab'],
+      ['Priya Sharma','Undergraduate Student','University of Edinburgh, School of Informatics','Software engineering, LLM agents','Edinburgh','Computational'],
+      ['Jonas Weber','Postdoctoral Researcher','University of Edinburgh, School of Biological Sciences','Systems biology, modelling','Edinburgh','Dry-lab'],
+      ['Fatima Al-Sayed','PhD Student','King\'s College London, Pharmaceutical Sciences','Drug discovery','London','Dry-lab'],
+      ['Ross Henderson','Master\'s Student','University of Edinburgh, School of Mathematics','Statistics, Bayesian inference','Edinburgh','Computational'],
+      ['Nadia Petrova','PhD Student','University of Glasgow, School of Molecular Biosciences','Protein engineering','Glasgow','Wet-lab'],
+      ['Ollie Bennett','Undergraduate Student','University of Edinburgh, School of Engineering','Bioprocess engineering','Edinburgh','Wet-lab'],
+      ['Lucía Gómez','Master\'s Student','University of Edinburgh, Edinburgh College of Art','Design, science communication','Edinburgh','Non-coding'],
+      ['Kwame Asante','PhD Student','University of Manchester, Division of Informatics','Genomics pipelines','Manchester','Dry-lab'],
+      ['Sarah Douglas','Academic Staff / Faculty','University of Edinburgh, School of Biological Sciences','Microbiology','Edinburgh','Wet-lab'],
+      ['Ben Thompson','PhD Student','Newcastle University, Biosciences Institute','Ageing biology','Newcastle','Wet-lab'],
+      ['Aisha Rahman','Master\'s Student','University of Edinburgh, School of Informatics','Data science, NLP','Edinburgh','Computational'],
+      ['Finn O\'Brien','Undergraduate Student','University of St Andrews, School of Biology','Ecology, field data','St Andrews','Dry-lab']
+    ];
+    var statuses=['new','new','review','accepted','confirmed','new','review','accepted','waitlist','confirmed','rejected','new','review','confirmed','accepted','new','draft','confirmed','waitlist','new','review','accepted','confirmed','new','rejected','declined','review','new'];
+    var hopes=['Work on a real dataset with people outside my lab and learn how industry frames a problem.','Build a working prototype in a weekend and meet people from computing who I would not normally work with.','Practise pitching and learn how biotech companies think about product-market fit.','Apply my ML skills to biology and find collaborators for a side project.'];
+    var proj=['Thesis: CRISPR knockout screen in yeast, analysed in R (DESeq2) and Python (pandas).','Image segmentation of microscopy data with PyTorch and Cellpose; deployed a Streamlit demo.','Docking campaign with AutoDock Vina and RDKit; wrote a small pipeline in Snakemake.','Market analysis for a diagnostics startup idea; Figma prototypes and a pitch deck.'];
+    var skills=['Python, pandas, scikit-learn; experiment design.','Wet-lab: cloning, cell culture, flow cytometry. Basic R.','Product thinking, user interviews, slide design.','PyTorch, computer vision, Git, HPC (Eddie).'];
+    var reviewers=[['apple.chew@ed.ac.uk','Apple'],['ian.yang@ed.ac.uk','Ian']];
+    var base=Date.UTC(2027,0,12,9,0);
+    return people.map(function(p,i){
+      var st=statuses[i];var tr=[TRACKS[i%3]];if(i%4===0) tr.push(TRACKS[(i+1)%3]);if(i%9===5) tr=[TRACKS[3]];
+      var diet=[DIETS[[0,0,1,2,0,3,4,0,1,0,6][i%11]]];
+      var reviews=[];
+      if(st!=='new'&&st!=='draft'){
+        var n=(i%3===0)?2:1;
+        for(var k=0;k<n;k++){var sc=[4,3,5,2,4,5,3][(i+k)%7];if(st==='rejected') sc=2;if(st==='confirmed'||st==='accepted') sc=Math.max(sc,4);
+          var who=reviewers[(i+k)%2];
+          reviews.push({by:who[0],name:who[1],score:sc,vote:sc>=4?'accept':sc===3?'maybe':'reject',category:p[5],note:['Strong, specific project experience.','Good fit for the non-coding track.','Motivation is generic; CV is thin on skills.','Would balance a computational team well.'][(i+k)%4],at:new Date(base+(i*7+k)*3600e3).toISOString()});}
+      }
+      var sub=st==='draft'?null:new Date(base+i*5.3*3600e3).toISOString();
+      return {
+        id:'A'+(1001+i), status:st, submitted_at:sub, tags:i%6===0?['Strong CV']:i%7===3?['Team request']:[],
+        full_name:p[0], email:p[0].toLowerCase().replace(/[^a-z ]/g,'').replace(/ /g,'.')+'@example.ac.uk', pronouns:['she/her','he/him','they/them',''][i%4],
+        city:p[4], institution:p[2], level:p[1], fields:p[3],
+        placements:['0','1','2','3 or more'][i%4], hackathons:['0','1','0','2','3 or more'][i%5],
+        project_experience:proj[i%4], skills:skills[i%4], tracks:tr, hopes:hopes[i%4],
+        cv:{name:p[0].split(' ')[1]+'_CV.pdf',size:140000+i*9100},
+        team:i%7===3?'Yes, I already know people I would like to work with':i%3===0?'No, please match me up':'No, I will find my teammates myself before the hackathon', team_other:'',
+        teammates:i%7===3?'Team "Lab Rats": '+people[(i+1)%28][0]+', '+people[(i+2)%28][0]:'',
+        diet:diet, diet_other:diet[0]==='Other'?'No nuts':'',
+        travel:p[4]!=='Edinburgh'&&i%2===0?'Yes, I require support (please specify)':'No travel support needed',
+        travel_details:p[4]!=='Edinburgh'&&i%2===0?'Return train from '+p[4]+', about £'+(25+i%5*9)+'.':'',
+        tshirt:TEES[[2,1,3,2,4,0,2,3,5,1][i%10]], accessibility:i===6?'Step-free access to the venue, please.':i===19?'Quiet room for breaks would help.':'',
+        photo:i%8===4?'No':'Yes', category:reviews.length?reviews[0].category:'',
+        reviews:reviews, grant:'', log:sub?[{at:sub,text:'Application submitted'}]:[{at:new Date(base+i*5.3*3600e3).toISOString(),text:'Draft started'}]
+      };
+    });
+  }
+  function sampleChallenges(){
+    return [
+      {id:'C201',title:'Tracking transient protein filaments in living cells',name:'Example Researcher',organisation:'Example University lab',submitter_type:'Academic',role:'Research fellow',track:'Academic Research',backgrounds:['Computational / Data Science','Machine Learning / AI'],mentoring:'Yes – limited availability',judging:'Maybe',nonconfidential:'Fully non-confidential, shareable, and suitable for student use',status:'new',submitted_at:'2027-01-08T10:00:00Z',description:'Detect and measure short-lived filaments in time-lapse microscopy.'},
+      {id:'C202',title:'Designing a low-cost biomanufacturing pilot',name:'Example Founder',organisation:'Example Bio Ltd',submitter_type:'SME / Startup',role:'CEO',track:'Industrial Innovation',backgrounds:['Engineering / Synthetic Biology','Business / Entrepreneurship'],mentoring:'Yes – during challenge introduction + office hours',judging:'Yes',nonconfidential:'Fully non-confidential, shareable, and suitable for student use',status:'accepted',submitted_at:'2027-01-10T15:30:00Z',description:'Scope a pilot plant for a fermentation product with techno-economic analysis.'},
+      {id:'C203',title:'Explaining genomic risk to patients',name:'Example Lead',organisation:'Example Health Board',submitter_type:'Public Sector',role:'Service lead',track:'Non-Coding Problem-Solving',backgrounds:['Design / Communication'],mentoring:'Not sure yet',judging:'Maybe',nonconfidential:'I’m not sure (we will contact you)',status:'new',submitted_at:'2027-01-14T09:20:00Z',description:'Design materials that explain polygenic risk scores to non-specialists.'}
+    ];
+  }
+
+  // ---------- Helpers ----------
+  function $(id){return document.getElementById(id)}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function avg(a){var s=a.reviews.filter(function(r){return r.score});return s.length?s.reduce(function(t,r){return t+r.score},0)/s.length:null}
+  function fmtDate(iso){if(!iso) return '—';var d=new Date(iso);return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}
+  function fmtTime(iso){var d=new Date(iso);return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
+  function isEdi(a){return /university of edinburgh/i.test(a.institution)}
+  function trackCls(t){return /Academic/.test(t)?'t-ac':/Industr/.test(t)?'t-in':/Non-Cod/.test(t)?'t-nc':''}
+  function trackShort(t){return t.replace(' Track','').replace('Problem-Solving','PS')}
+  function submitted(){return apps.filter(function(a){return a.status!=='draft'})}
+  var toastT;function toast(m){var t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on')},2600)}
+  function copyText(txt,msg){
+    var done=function(){toast(msg)};
+    try{navigator.clipboard.writeText(txt).then(done,function(){fallback()})}catch(e){fallback()}
+    function fallback(){var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(e){toast('Copy failed. Select the text manually.')}ta.remove()}
+  }
+  function save(a,patch,logText){
+    Object.keys(patch).forEach(function(k){a[k]=patch[k]});
+    if(logText) a.log.unshift({at:new Date().toISOString(),text:logText});
+    if(LIVE) fetch(API.one(a.id),{method:'PATCH',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(patch)}).then(function(r){if(!r.ok) throw 0}).catch(function(){toast('Could not save. Check your connection.')});
+    else persistPreview();
+  }
+  function persistPreview(){try{localStorage.setItem('ebh-admin-preview',JSON.stringify({apps:apps,challenges:challenges}))}catch(e){}}
+
+  // ---------- Routing ----------
+  var VIEWS=['overview','applicants','logistics','challenges'];
+  function route(){
+    var v=(location.hash||'#overview').slice(1);if(VIEWS.indexOf(v)<0) v='overview';
+    document.querySelectorAll('[data-view]').forEach(function(s){s.hidden=s.getAttribute('data-view')!==v});
+    document.querySelectorAll('[data-v]').forEach(function(a){a.classList.toggle('on',a.getAttribute('data-v')===v)});
+    render();
+  }
+  window.addEventListener('hashchange',route);
+
+  // ---------- Overview ----------
+  function bars(el,rows,opts){
+    opts=opts||{};var max=Math.max.apply(null,rows.map(function(r){return r[1]}).concat([1]));
+    el.innerHTML=rows.map(function(r){return '<div class="bar'+(opts.click?' click':'')+'" data-k="'+esc(r[0])+'"><span class="bl" title="'+esc(r[0])+'">'+esc(r[0])+'</span><span class="bt"><i style="width:'+(r[1]/max*100)+'%;--c:'+(r[2]||'var(--accent)')+'"></i></span><span class="bv tnum">'+r[1]+'</span></div>'}).join('')||'<div class="muted">Nothing yet.</div>';
+    if(opts.click) el.querySelectorAll('.bar').forEach(function(b){b.addEventListener('click',function(){opts.click(b.getAttribute('data-k'))})});
+  }
+  function count(list,fn,keys){var m={};keys.forEach(function(k){m[k]=0});list.forEach(function(a){[].concat(fn(a)).forEach(function(k){if(k) m[k]=(m[k]||0)+1})});return Object.keys(m).map(function(k){return [k,m[k]]})}
+  function renderOverview(){
+    var s=submitted(),acc=apps.filter(function(a){return a.status==='accepted'||a.status==='confirmed'});
+    var unrev=s.filter(function(a){return !a.reviews.some(function(r){return r.by===ME.email})}).length;
+    var ext=s.filter(function(a){return !isEdi(a)}).length;
+    var k=[['Submitted',s.length,apps.length-s.length+' drafts in progress'],['To review by you',unrev,'not yet scored by you'],['Accepted',acc.length,'of a '+TARGET+'-person target'],['Confirmed',apps.filter(function(a){return a.status==='confirmed'}).length,'places secured'],['From outside UoE',s.length?Math.round(ext/s.length*100)+'%':'—',ext+' applicants']];
+    $('kpis').innerHTML=k.map(function(x){return '<div class="kpi"><div class="l">'+x[0]+'</div><div class="v tnum">'+x[1]+'</div><div class="d">'+x[2]+'</div></div>'}).join('');
+    var stages=['new','review','accepted','waitlist','rejected','confirmed'];
+    $('funnel').innerHTML=stages.map(function(st){return '<button class="fs" type="button" data-st="'+st+'"><span class="st s-'+st+'">'+SLABEL[st]+'</span><div class="v tnum">'+apps.filter(function(a){return a.status===st}).length+'</div></button>'}).join('');
+    $('funnel').querySelectorAll('.fs').forEach(function(b){b.addEventListener('click',function(){goFilter({status:b.getAttribute('data-st')})})});
+    // cohort balance among accepted + confirmed
+    var cc=count(acc,function(a){return a.category||'Not set'},CATS.concat(['Not set'])).filter(function(r){return r[1]});
+    $('tgt-label').textContent=acc.length+' accepted of '+TARGET+' places';
+    $('tgt-bar').innerHTML=cc.map(function(r){return '<i style="width:'+(r[1]/TARGET*100)+'%;background:'+CATC[r[0]]+'" title="'+esc(r[0])+': '+r[1]+'"></i>'}).join('');
+    $('tgt-bar').setAttribute('aria-label',cc.map(function(r){return r[0]+' '+r[1]}).join(', '));
+    $('tgt-legend').innerHTML=cc.map(function(r){return '<span><i style="background:'+CATC[r[0]]+'"></i>'+esc(r[0])+' · '+r[1]+'</span>'}).join('')+'<span><i style="background:var(--line2)"></i>Open · '+Math.max(0,TARGET-acc.length)+'</span>';
+    bars($('b-level'),count(s,function(a){return a.level},LEVELS),{click:function(k){goFilter({level:k})}});
+    bars($('b-cat'),count(s,function(a){return a.category||'Not set'},CATS.concat(['Not set'])).map(function(r){return r.concat(CATC[r[0]])}),{click:function(k){goFilter({category:k})}});
+    bars($('b-track'),count(s,function(a){return a.tracks},TRACKS).map(function(r){return [r[0],r[1],/Academic/.test(r[0])?'#7E4AA8':/Industr/.test(r[0])?'#3639FD':/Non-Cod/.test(r[0])?'#2F7F82':'#9CA3AF']}),{click:function(k){goFilter({track:k})}});
+    var where=count(s,function(a){return isEdi(a)?'University of Edinburgh':a.institution.split(',')[0]},[]).sort(function(x,y){return y[1]-x[1]});
+    bars($('b-where'),where.slice(0,8),{click:function(k){goFilter({q:k})}});
+  }
+
+  // ---------- Applicants ----------
+  var F={view:'all',status:'',q:'',level:'',category:'',track:'',hackathons:'',placements:'',travel:'',diet:'',tee:'',team:'',origin:'',photo:'',minScore:'',mine:''};
+  var SORT={k:'submitted',d:'desc'};
+  var selected={};
+  var VIEWDEFS=[
+    ['all','All submitted',function(a){return a.status!=='draft'}],
+    ['todo','To review by me',function(a){return a.status!=='draft'&&!a.reviews.some(function(r){return r.by===ME.email})&&['new','review'].indexOf(a.status)>-1}],
+    ['new','New',function(a){return a.status==='new'}],
+    ['shortlist','In review',function(a){return a.status==='review'}],
+    ['accepted','Accepted & confirmed',function(a){return a.status==='accepted'||a.status==='confirmed'}],
+    ['waitlist','Waitlist',function(a){return a.status==='waitlist'}],
+    ['travel','Needs travel support',function(a){return a.status!=='draft'&&/^Yes/.test(a.travel)}],
+    ['drafts','Drafts',function(a){return a.status==='draft'}]
+  ];
+  var FDEFS=[
+    ['level','Level / role',LEVELS],
+    ['category','Discipline category',CATS.concat(['Not set'])],
+    ['track','Track interest',TRACKS],
+    ['origin','Institution',['University of Edinburgh','Outside UoE']],
+    ['hackathons','Hackathons done',['0','1','2','3 or more']],
+    ['placements','Placements done',['0','1','2','3 or more']],
+    ['team','Team',['Yes, I already know people I would like to work with','No, I will find my teammates myself before the hackathon','No, please match me up','Other']],
+    ['travel','Travel support',['No travel support needed','Yes, I require support (please specify)']],
+    ['diet','Dietary',DIETS],
+    ['tee','T-shirt',TEES],
+    ['photo','Photo consent',['Yes','No']],
+    ['minScore','Average score',['4','3','2']]
+  ];
+  var FLABEL={status:'Status',q:'Search'};FDEFS.forEach(function(f){FLABEL[f[0]]=f[1]});
+  function buildFilters(){
+    $('f-status').innerHTML='<option value="">Any status</option>'+STATUSES.map(function(s){return '<option value="'+s[0]+'">'+s[1]+'</option>'}).join('');
+    $('filters').innerHTML=FDEFS.map(function(f){return '<div class="fbox"><label for="ff-'+f[0]+'">'+f[1]+'</label><select id="ff-'+f[0]+'" data-f="'+f[0]+'"><option value="">Any</option>'+f[2].map(function(o){return '<option value="'+esc(o)+'">'+esc(f[0]==='minScore'?o+'+ ★':o)+'</option>'}).join('')+'</select></div>'}).join('');
+    $('filters').querySelectorAll('select').forEach(function(s){s.addEventListener('change',function(){F[s.getAttribute('data-f')]=s.value;renderApplicants()})});
+    $('bulk-st').innerHTML=STATUSES.filter(function(s){return s[0]!=='draft'}).map(function(s){return '<option value="'+s[0]+'">'+s[1]+'</option>'}).join('');
+    $('d-status').innerHTML=STATUSES.map(function(s){return '<option value="'+s[0]+'">'+s[1]+'</option>'}).join('');
+  }
+  function match(a){
+    var vd=VIEWDEFS.filter(function(v){return v[0]===F.view})[0];if(vd&&!vd[2](a)) return false;
+    if(F.status&&a.status!==F.status) return false;
+    if(F.level&&a.level!==F.level) return false;
+    if(F.category&&(a.category||'Not set')!==F.category) return false;
+    if(F.track&&a.tracks.indexOf(F.track)<0) return false;
+    if(F.origin&&(F.origin==='University of Edinburgh')!==isEdi(a)) return false;
+    if(F.hackathons&&a.hackathons!==F.hackathons) return false;
+    if(F.placements&&a.placements!==F.placements) return false;
+    if(F.team&&a.team!==F.team) return false;
+    if(F.travel&&a.travel!==F.travel) return false;
+    if(F.diet&&a.diet.indexOf(F.diet)<0) return false;
+    if(F.tee&&a.tshirt!==F.tee) return false;
+    if(F.photo&&a.photo!==F.photo) return false;
+    if(F.minScore){var s=avg(a);if(s==null||s<+F.minScore) return false}
+    if(F.q){var hay=[a.full_name,a.email,a.institution,a.fields,a.skills,a.project_experience,a.city,a.tags.join(' ')].join(' ').toLowerCase();if(hay.indexOf(F.q.toLowerCase())<0) return false}
+    return true;
+  }
+  function sorted(list){
+    var k=SORT.k,d=SORT.d==='asc'?1:-1;
+    return list.slice().sort(function(x,y){
+      var a,b;
+      if(k==='score'){a=avg(x);b=avg(y);if(a==null) a=-1;if(b==null) b=-1}
+      else if(k==='name'){a=x.full_name.toLowerCase();b=y.full_name.toLowerCase()}
+      else {a=x.submitted_at||'';b=y.submitted_at||''}
+      return a<b?-d:a>b?d:0;
+    });
+  }
+  var shown=[];
+  function renderApplicants(){
+    $('views').innerHTML=VIEWDEFS.map(function(v){return '<button type="button" data-view-id="'+v[0]+'" class="'+(F.view===v[0]?'on':'')+'">'+v[1]+'<span class="c">'+apps.filter(v[2]).length+'</span></button>'}).join('');
+    $('views').querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){F.view=b.getAttribute('data-view-id');renderApplicants()})});
+    $('f-status').value=F.status;$('q').value=F.q;$('sort').value=SORT.k+':'+SORT.d;
+    FDEFS.forEach(function(f){var s=$('ff-'+f[0]);if(s) s.value=F[f[0]]});
+    var chips=[];['status','q'].concat(FDEFS.map(function(f){return f[0]})).forEach(function(k){if(F[k]) chips.push('<button class="fchip" type="button" data-k="'+k+'">'+esc(FLABEL[k])+': <b>'+esc(k==='status'?SLABEL[F[k]]:k==='minScore'?F[k]+'+ ★':F[k])+'</b><span aria-hidden="true">×</span></button>')});
+    if(chips.length>1) chips.push('<button class="fchip" type="button" data-k="*" style="background:transparent">Clear all</button>');
+    $('chips').innerHTML=chips.join('');
+    $('chips').querySelectorAll('.fchip').forEach(function(c){c.addEventListener('click',function(){var k=c.getAttribute('data-k');if(k==='*'){['status','q'].concat(FDEFS.map(function(f){return f[0]})).forEach(function(x){F[x]=''})}else F[k]='';renderApplicants()})});
+    shown=sorted(apps.filter(match));
+    $('rows').innerHTML=shown.map(function(a){
+      var s=avg(a),dots='';for(var i=1;i<=5;i++) dots+='<i class="'+(s!=null&&i<=Math.round(s)?'f':'')+'"></i>';
+      var votes={accept:0,maybe:0,reject:0};a.reviews.forEach(function(r){if(r.vote) votes[r.vote]++});
+      var vhtml=a.reviews.length?['accept','maybe','reject'].filter(function(v){return votes[v]}).map(function(v){return '<span class="vote '+v+'">'+votes[v]+' '+v+'</span>'}).join(' '):'<span class="muted">—</span>';
+      return '<tr data-id="'+a.id+'" class="'+(selected[a.id]?'sel':'')+'"><td class="cb"><input type="checkbox" aria-label="Select '+esc(a.full_name)+'" '+(selected[a.id]?'checked':'')+'></td>'+
+        '<td class="nm"><b>'+esc(a.full_name)+'</b><span>'+esc(a.institution.split(',')[0])+(a.tags.length?' · '+a.tags.map(esc).join(', '):'')+'</span></td>'+
+        '<td>'+esc(a.level.replace(' Student','').replace('Postdoctoral Researcher','Postdoc').replace('Academic Staff / Faculty','Staff'))+'</td>'+
+        '<td style="max-width:180px">'+esc(a.fields)+'</td>'+
+        '<td>'+a.tracks.map(function(t){return '<span class="tag '+trackCls(t)+'">'+esc(trackShort(t))+'</span>'}).join(' ')+'</td>'+
+        '<td>'+(a.category?'<span class="tag" style="background:#FFFFFF;border:1px solid '+CATC[a.category]+';color:'+CATC[a.category]+'">'+esc(a.category)+'</span>':'<span class="muted">—</span>')+'</td>'+
+        '<td><span class="score tnum">'+(s!=null?s.toFixed(1):'—')+'<span class="dots">'+dots+'</span></span></td>'+
+        '<td>'+vhtml+'</td><td><span class="st s-'+a.status+'">'+SLABEL[a.status]+'</span></td><td class="tnum muted">'+fmtDate(a.submitted_at)+'</td></tr>';
+    }).join('');
+    $('empty').hidden=shown.length>0;
+    $('shown').textContent='Showing '+shown.length+' of '+apps.length+' applicants';
+    $('app-sub').textContent=submitted().length+' submitted · '+(apps.length-submitted().length)+' drafts';
+    document.querySelectorAll('th.sort').forEach(function(th){th.querySelector('.ar').textContent=th.getAttribute('data-sort')===SORT.k?(SORT.d==='asc'?'↑':'↓'):''});
+    $('rows').querySelectorAll('tr').forEach(function(tr){
+      var id=tr.getAttribute('data-id');
+      tr.addEventListener('click',function(e){if(e.target.closest('td.cb')) return;openDrawer(id)});
+      tr.querySelector('input').addEventListener('change',function(e){if(e.target.checked) selected[id]=1;else delete selected[id];tr.classList.toggle('sel',e.target.checked);paintBulk()});
+    });
+    $('all').checked=shown.length>0&&shown.every(function(a){return selected[a.id]});
+    paintBulk();
+  }
+  function paintBulk(){var n=Object.keys(selected).length;$('bulk').classList.toggle('show',n>0);$('bulk-n').textContent=n+' selected'}
+  $('all').addEventListener('change',function(e){shown.forEach(function(a){if(e.target.checked) selected[a.id]=1;else delete selected[a.id]});renderApplicants()});
+  $('bulk-clear').addEventListener('click',function(){selected={};renderApplicants()});
+  $('bulk-apply').addEventListener('click',function(){var st=$('bulk-st').value,ids=Object.keys(selected);ids.forEach(function(id){var a=byId(id);if(a&&a.status!==st) save(a,{status:st},'Status set to '+SLABEL[st]+' by '+ME.name+' (bulk)')});selected={};render();toast(ids.length+' applicants set to '+SLABEL[st])});
+  $('bulk-copy').addEventListener('click',function(){var e=Object.keys(selected).map(function(id){return byId(id).email});copyText(e.join(', '),e.length+' email addresses copied')});
+  $('q').addEventListener('input',function(e){F.q=e.target.value;renderApplicants()});
+  $('f-status').addEventListener('change',function(e){F.status=e.target.value;renderApplicants()});
+  $('sort').addEventListener('change',function(e){var p=e.target.value.split(':');SORT={k:p[0],d:p[1]};renderApplicants()});
+  document.querySelectorAll('th.sort').forEach(function(th){th.addEventListener('click',function(){var k=th.getAttribute('data-sort');SORT=SORT.k===k?{k:k,d:SORT.d==='asc'?'desc':'asc'}:{k:k,d:k==='name'?'asc':'desc'};renderApplicants()})});
+  $('b-filters').addEventListener('click',function(){var o=$('filters').classList.toggle('open');this.setAttribute('aria-expanded',o)});
+  function goFilter(p){Object.keys(F).forEach(function(k){if(k!=='view') F[k]=''});F.view=p.status==='draft'?'drafts':'all';Object.keys(p).forEach(function(k){F[k]=p[k]});if(p.level||p.category||p.track) $('filters').classList.add('open');location.hash='#applicants'}
+  function byId(id){return apps.filter(function(a){return a.id===id})[0]}
+
+  // CSV export of whatever is shown
+  $('b-export').addEventListener('click',function(){
+    var cols=[['id','ID'],['status','Status'],['full_name','Full name'],['email','Email'],['pronouns','Pronouns'],['city','City'],['institution','Institution and department'],['level','Level / role'],['fields','Fields'],['placements','Placements'],['hackathons','Hackathons'],['tracks','Tracks'],['category','Discipline category'],['avg','Average score'],['team','Team'],['teammates','Teammates'],['diet','Dietary'],['diet_other','Dietary (other)'],['travel','Travel support'],['travel_details','Travel details'],['tshirt','T-shirt'],['accessibility','Accessibility'],['photo','Photo consent'],['tags','Tags'],['submitted_at','Submitted']];
+    var q=function(v){v=v==null?'':String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+    var csv=[cols.map(function(c){return q(c[1])}).join(',')].concat(shown.map(function(a){return cols.map(function(c){var v=c[0]==='avg'?(avg(a)!=null?avg(a).toFixed(2):''):a[c[0]];if(Array.isArray(v)) v=v.join('; ');return q(v)}).join(',')})).join('\n');
+    if(LIVE){var b=new Blob([csv],{type:'text/csv'});var u=URL.createObjectURL(b);var l=document.createElement('a');l.href=u;l.download='biohackathon-applicants.csv';document.body.appendChild(l);l.click();l.remove();toast('Exported '+shown.length+' applicants')}
+    else copyText(csv,'Preview: CSV of '+shown.length+' applicants copied. On the live site this downloads a file.');
+  });
+
+  // ---------- Drawer ----------
+  var cur=null;
+  function openDrawer(id){cur=byId(id);if(!cur) return;paintDrawer();$('drawer').classList.add('on');$('scrim').classList.add('on');$('drawer').setAttribute('aria-hidden','false');$('d-close').focus()}
+  function closeDrawer(){$('drawer').classList.remove('on');$('scrim').classList.remove('on');$('drawer').setAttribute('aria-hidden','true');cur=null;render()}
+  $('d-close').addEventListener('click',closeDrawer);$('scrim').addEventListener('click',closeDrawer);
+  document.addEventListener('keydown',function(e){if(!cur) return;if(e.key==='Escape') closeDrawer();if(e.target.matches('textarea,input,select')) return;if(e.key==='j'||e.key==='ArrowDown'){step(1);e.preventDefault()}if(e.key==='k'||e.key==='ArrowUp'){step(-1);e.preventDefault()}});
+  function step(n){var i=shown.indexOf(cur);if(i<0) return;var nx=shown[i+n];if(nx){cur=nx;paintDrawer();$('d-body').scrollTop=0}}
+  $('d-prev').addEventListener('click',function(){step(-1)});$('d-next').addEventListener('click',function(){step(1)});
+  $('d-status').addEventListener('change',function(e){var st=e.target.value;save(cur,{status:st},'Status set to '+SLABEL[st]+' by '+ME.name);paintDrawer();toast(cur.full_name+' → '+SLABEL[st])});
+  function kv(rows){return '<dl class="kv">'+rows.map(function(r){return '<dt>'+esc(r[0])+'</dt><dd>'+(r[2]?r[1]:esc(r[1]||'—'))+'</dd>'}).join('')+'</dl>'}
+  function ans(q,v){return '<div class="ans"><b>'+esc(q)+'</b><p>'+esc(v||'—')+'</p></div>'}
+  function paintDrawer(){
+    var a=cur;$('d-name').textContent=a.full_name;
+    $('d-meta').textContent=a.level+' · '+a.institution+(a.pronouns?' · '+a.pronouns:'');
+    $('d-status').value=a.status;
+    var s=avg(a);$('d-avg').innerHTML=s!=null?'<b class="tnum">'+s.toFixed(1)+'</b> avg from '+a.reviews.length+' review'+(a.reviews.length>1?'s':''):'<span class="muted">No scores yet</span>';
+    var i=shown.indexOf(a);$('d-prev').disabled=i<=0;$('d-next').disabled=i<0||i>=shown.length-1;
+    var mine=a.reviews.filter(function(r){return r.by===ME.email})[0]||{score:0,vote:'',category:a.category||'',note:''};
+    var others=a.reviews.filter(function(r){return r.by!==ME.email});
+    var h='';
+    h+='<div class="review"><h4>Your review</h4>'+
+      '<div class="rrow"><span class="rl">Score</span><div class="stars" id="r-score">'+[1,2,3,4,5].map(function(n){return '<button type="button" data-n="'+n+'" class="'+(mine.score===n?'on':'')+'" aria-label="Score '+n+'">'+n+'</button>'}).join('')+'</div></div>'+
+      '<div class="rrow"><span class="rl">Vote</span><div class="seg" id="r-vote">'+[['accept','Accept'],['maybe','Maybe'],['reject','Reject']].map(function(v){return '<button type="button" data-v="'+v[0]+'" class="v-'+v[0]+(mine.vote===v[0]?' on':'')+'">'+v[1]+'</button>'}).join('')+'</div></div>'+
+      '<div class="rrow"><span class="rl">Discipline</span><div class="seg" id="r-cat">'+CATS.map(function(c){return '<button type="button" data-c="'+c+'" class="cat'+(a.category===c?' on':'')+'">'+c+'</button>'}).join('')+'</div></div>'+
+      '<label class="rl" for="r-note" style="font-size:13px;font-weight:600">Screening note</label><textarea id="r-note" placeholder="Visible to the committee only">'+esc(mine.note)+'</textarea></div>';
+    if(others.length) h+='<div class="sec"><h4>Other reviews</h4><div class="others">'+others.map(function(r){return '<div class="oth"><span class="av">'+esc(r.name.slice(0,2).toUpperCase())+'</span><div><b>'+esc(r.name)+'</b> · '+(r.score||'—')+'/5<p>'+esc(r.note||'')+'</p></div>'+(r.vote?'<span class="vote '+r.vote+'">'+r.vote+'</span>':'')+'</div>'}).join('')+'</div></div>';
+    h+='<div class="sec"><h4>Tags</h4><div class="tagsed" id="tagsed">'+a.tags.map(function(t,ix){return '<span class="tag">'+esc(t)+'<button type="button" data-ix="'+ix+'" aria-label="Remove tag '+esc(t)+'">×</button></span>'}).join('')+'<input id="tag-in" placeholder="Add tag, press Enter" aria-label="Add tag"></div></div>';
+    h+='<div class="sec"><h4>About</h4>'+kv([
+      ['Email',esc(a.email)+'<button class="copy" type="button" id="cp-email">Copy</button>',true],['Pronouns',a.pronouns],['Travelling from',a.city],['Institution',a.institution],['Level / role',a.level],['Fields',a.fields],
+      ['Placements',a.placements],['Hackathons',a.hackathons],['Submitted',a.submitted_at?fmtTime(a.submitted_at):'Not submitted (draft)']])+'</div>';
+    h+='<div class="sec"><h4>CV</h4>'+(a.cv?'<div class="cv"><span class="fi">'+esc((a.cv.name.split('.').pop()||'').toUpperCase())+'</span><div><b>'+esc(a.cv.name)+'</b><span>'+(a.cv.size/1024/1024).toFixed(2)+' MB</span></div>'+(LIVE?'<a class="btn" href="'+API.cv(a.id)+'" target="_blank" rel="noopener">Open</a>':'<button class="btn" type="button" id="cv-open">Open</button>')+'</div>':'<span class="muted">No CV uploaded</span>')+'</div>';
+    h+='<div class="sec"><h4>Answers</h4>'+
+      '<div class="ans"><b>Track interest</b><div>'+a.tracks.map(function(t){return '<span class="tag '+trackCls(t)+'">'+esc(t)+'</span>'}).join(' ')+'</div></div>'+
+      ans('Past project experience and tech stack',a.project_experience)+ans('Skills they can contribute',a.skills)+ans('What they hope to achieve',a.hopes)+'</div>';
+    h+='<div class="sec"><h4>Team &amp; logistics</h4>'+kv([['Team',a.team==='Other'?'Other: '+a.team_other:a.team],['Teammates',a.teammates],['Dietary',a.diet.join(', ')+(a.diet_other?' ('+a.diet_other+')':'')],['Travel support',a.travel],['Travel details',a.travel_details],['T-shirt',a.tshirt],['Accessibility',a.accessibility],['Photo consent',a.photo]])+'</div>';
+    if(/^Yes/.test(a.travel)) h+='<div class="sec"><h4>Travel grant</h4><div class="rrow"><label class="rl" for="grant">Approved amount (£)</label><input id="grant" class="btn" style="font-weight:500;width:120px" inputmode="decimal" value="'+esc(a.grant)+'" placeholder="up to 60"></div></div>';
+    h+='<div class="sec"><h4>Activity</h4><div class="log">'+a.log.map(function(l){return '<div><time>'+fmtTime(l.at)+'</time><span>'+esc(l.text)+'</span></div>'}).join('')+'</div></div>';
+    $('d-body').innerHTML=h;
+
+    function upsert(patch,label){
+      var r=a.reviews.filter(function(x){return x.by===ME.email})[0];
+      if(!r){r={by:ME.email,name:ME.name,score:0,vote:'',category:a.category,note:''};a.reviews.push(r)}
+      Object.keys(patch).forEach(function(k){r[k]=patch[k]});r.at=new Date().toISOString();
+      if(a.status==='new'){a.status='review';a.log.unshift({at:r.at,text:'Moved to In review'});$('d-status').value='review'}
+      if(label) a.log.unshift({at:r.at,text:label});
+      if(LIVE) fetch(API.review(a.id),{method:'PUT',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({score:r.score,vote:r.vote,note:r.note,category:a.category})}).catch(function(){toast('Could not save your review.')});
+      else persistPreview();
+    }
+    $('r-score').querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){upsert({score:+b.getAttribute('data-n')},ME.name+' scored '+b.getAttribute('data-n')+'/5');paintDrawer()})});
+    $('r-vote').querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){upsert({vote:b.getAttribute('data-v')},ME.name+' voted '+b.getAttribute('data-v'));paintDrawer()})});
+    $('r-cat').querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){a.category=b.getAttribute('data-c');upsert({category:a.category},'Discipline set to '+a.category);paintDrawer()})});
+    var nt;$('r-note').addEventListener('input',function(e){clearTimeout(nt);var v=e.target.value;nt=setTimeout(function(){upsert({note:v})},600)});
+    $('tag-in').addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.value.trim()){var t=e.target.value.trim();if(a.tags.indexOf(t)<0) save(a,{tags:a.tags.concat([t])},'Tag added: '+t);paintDrawer();$('tag-in').focus()}});
+    $('tagsed').querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){var t=a.tags[+b.getAttribute('data-ix')];save(a,{tags:a.tags.filter(function(x){return x!==t})},'Tag removed: '+t);paintDrawer()})});
+    $('cp-email').addEventListener('click',function(){copyText(a.email,'Email copied')});
+    var co=$('cv-open');if(co) co.addEventListener('click',function(){toast('Preview: on the live site this opens the applicant\'s CV.')});
+    var g=$('grant');if(g) g.addEventListener('change',function(){save(a,{grant:g.value},'Travel grant set to £'+g.value)});
+  }
+
+  // ---------- Logistics ----------
+  function renderLogistics(){
+    var scope=$('lg-scope').value;
+    var list=apps.filter(function(a){return scope==='confirmed'?a.status==='confirmed':scope==='accepted'?(a.status==='accepted'||a.status==='confirmed'):a.status!=='draft'});
+    var trav=list.filter(function(a){return /^Yes/.test(a.travel)});
+    var granted=trav.reduce(function(t,a){return t+(parseFloat(a.grant)||0)},0);
+    var k=[['People',list.length,'in this view'],['Special diets',list.filter(function(a){return a.diet.some(function(d){return d!=='No dietary restrictions / None'})}).length,'need a non-standard meal'],['T-shirts',list.filter(function(a){return a.tshirt!=="I don't want a T-shirt"}).length,'to order'],['Travel requests',trav.length,'£'+granted.toFixed(0)+' approved so far'],['No photos',list.filter(function(a){return a.photo==='No'}).length,'opted out of photos']];
+    $('lg-kpis').innerHTML=k.map(function(x){return '<div class="kpi"><div class="l">'+x[0]+'</div><div class="v tnum">'+x[1]+'</div><div class="d">'+x[2]+'</div></div>'}).join('');
+    bars($('lg-diet'),count(list,function(a){return a.diet},DIETS));
+    var od=list.filter(function(a){return a.diet_other});
+    $('lg-diet-other').innerHTML=od.map(function(a){return '<div class="li"><div><b>'+esc(a.full_name)+'</b><p>'+esc(a.diet_other)+'</p></div></div>'}).join('');
+    bars($('lg-tee'),count(list,function(a){return a.tshirt},TEES));
+    $('lg-travel-sum').textContent=trav.length+' requests';
+    $('lg-travel').innerHTML=trav.map(function(a){return '<div class="li" data-id="'+a.id+'" style="cursor:pointer"><div><b>'+esc(a.full_name)+'</b><p>'+esc(a.travel_details||'No details given')+'</p></div><span class="r">'+(a.grant?'<span class="st s-accepted">£'+esc(a.grant)+'</span>':'<span class="st">Not decided</span>')+'</span></div>'}).join('')||'<div class="muted">No travel requests in this view.</div>';
+    var acc=list.filter(function(a){return a.accessibility||a.photo==='No'});
+    $('lg-access').innerHTML=acc.map(function(a){return '<div class="li" data-id="'+a.id+'" style="cursor:pointer"><div><b>'+esc(a.full_name)+'</b><p>'+esc(a.accessibility||'')+(a.accessibility&&a.photo==='No'?' · ':'')+(a.photo==='No'?'No photos or video':'')+'</p></div></div>'}).join('')||'<div class="muted">Nothing to flag in this view.</div>';
+    document.querySelectorAll('[data-view="logistics"] .li[data-id]').forEach(function(li){li.addEventListener('click',function(){location.hash='#applicants';setTimeout(function(){openDrawer(li.getAttribute('data-id'))},50)})});
+  }
+  $('lg-scope').addEventListener('change',renderLogistics);
+
+  // ---------- Challenges ----------
+  var CH={view:'all'};
+  function renderChallenges(){
+    var vs=[['all','All'],['new','New'],['accepted','Accepted'],['rejected','Declined']];
+    $('ch-views').innerHTML=vs.map(function(v){var n=challenges.filter(function(c){return v[0]==='all'||c.status===v[0]}).length;return '<button type="button" data-cv="'+v[0]+'" class="'+(CH.view===v[0]?'on':'')+'">'+v[1]+'<span class="c">'+n+'</span></button>'}).join('');
+    $('ch-views').querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){CH.view=b.getAttribute('data-cv');renderChallenges()})});
+    var list=challenges.filter(function(c){return CH.view==='all'||c.status===CH.view});
+    $('ch-cards').innerHTML=list.map(function(c){var tc=/Academic/.test(c.track)?'#7E4AA8':/Industr/.test(c.track)?'#3639FD':/Non-Cod/.test(c.track)?'#2F7F82':'#C9CDD3';
+      return '<div class="ch" style="--tc:'+tc+'"><div class="h"><b>'+esc(c.title)+'</b><select data-id="'+c.id+'" aria-label="Status for '+esc(c.title)+'" class="btn" style="padding:4px 6px;font-size:12.5px"><option value="new"'+(c.status==='new'?' selected':'')+'>New</option><option value="accepted"'+(c.status==='accepted'?' selected':'')+'>Accepted</option><option value="rejected"'+(c.status==='rejected'?' selected':'')+'>Declined</option></select></div>'+
+        '<div class="who">'+esc(c.name)+' · '+esc(c.organisation)+' · '+esc(c.submitter_type)+'</div><p>'+esc(c.description)+'</p>'+
+        '<div class="tags">'+(c.track?'<span class="tag '+trackCls(c.track)+'">'+esc(c.track)+'</span>':'')+(c.backgrounds||[]).map(function(b){return '<span class="tag">'+esc(b)+'</span>'}).join('')+'</div>'+
+        '<div class="who">Mentoring: '+esc(c.mentoring)+' · Judging: '+esc(c.judging)+(/not sure/i.test(c.nonconfidential)?' · <span class="st s-waitlist">Check confidentiality</span>':'')+'</div></div>'}).join('')||'<div class="panel muted">No challenges here yet.</div>';
+    $('ch-cards').querySelectorAll('select').forEach(function(s){s.addEventListener('change',function(){var c=challenges.filter(function(x){return x.id===s.getAttribute('data-id')})[0];c.status=s.value;if(LIVE) fetch(API.challenges+'/'+c.id,{method:'PATCH',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:c.status})}).catch(function(){toast('Could not save.')});else persistPreview();renderChallenges();$('n-ch').textContent=challenges.length;toast('Challenge updated')})});
+  }
+
+  function render(){
+    $('n-app').textContent=submitted().length;$('n-ch').textContent=challenges.length;
+    var v=(location.hash||'#overview').slice(1);
+    if(v==='applicants') renderApplicants();else if(v==='logistics') renderLogistics();else if(v==='challenges') renderChallenges();else renderOverview();
+  }
+
+  // ---------- Boot ----------
+  buildFilters();
+  function boot(){
+    if(LIVE){
+      Promise.all([fetch(API.me,{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}),fetch(API.list,{credentials:'same-origin'}).then(function(r){return r.json()}),fetch(API.challenges,{credentials:'same-origin'}).then(function(r){return r.json()})])
+        .then(function(res){if(res[0]){ME=res[0];$('me-name').textContent=ME.email;$('me-av').textContent=(ME.name||ME.email).slice(0,2).toUpperCase()}apps=res[1]||[];challenges=res[2]||[];route()})
+        .catch(function(){toast('Could not load applications. Refresh to try again.')});
+      return;
+    }
+    document.querySelectorAll('[data-sample]').forEach(function(s){s.hidden=false});
+    var st=null;try{st=JSON.parse(localStorage.getItem('ebh-admin-preview')||'null')}catch(e){}
+    apps=st&&st.apps?st.apps:sample();challenges=st&&st.challenges?st.challenges:sampleChallenges();
+    route();
+  }
+  boot();
+})();
+</script>
